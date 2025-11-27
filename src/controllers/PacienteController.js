@@ -103,4 +103,29 @@ export class PacienteController{
             return{success:false, error}
         }
     }
+    //funcion para actualizar el estado del paciente
+    static async ActualizarEstado(curp,paciente){
+    try{
+        const {data, error} = await PacienteService.ActualizarEstado(curp,paciente);
+        if (error) return { paciente: null, error };
+        return { paciente: data, error: null };
+    }
+        catch(error){
+        return { paciente: null, error };
+        }
+    }
+    //funcion para estado
+    static async obtenerEstadoPaciente(curp){
+        try{
+            const {data,error} = await PacienteService.obtenerEstadoPaciente(curp);
+            if (error){
+                return{paciente:null,error};
+            }
+            return{paciente:data,error:null}
+            }
+            catch(error){
+                return{paciente:null,error};
+            }
+        }
+    
 }

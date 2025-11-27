@@ -102,4 +102,42 @@ export class PacienteService {
         return { data: null, error };
     }
     }
+    //ver solo el estado del paciente
+
+    //actualizar solo estado del paciente(funcion se usara en 2 partes)
+     static async ActualizarEstado(curp,paciente) {
+    try {
+        const { data, error } = await supabase
+            .from('paciente')
+            .update({
+                descripcion_deestado: paciente.descripcion_deestado, 
+
+            })
+            .eq('curp', curp)
+            .select()
+            .single();
+
+        if (error) return { data: null, error };
+        return { data, error: null };
+    } catch (error) {
+        return { data: null, error };
+    }
+    }
+    static async obtenerEstadoPaciente(curp) {
+    try {
+        const { data, error } = await supabase
+            .from('paciente')
+            .select('descripcion_deestado, nombre_completo')
+            .eq('curp', curp)
+            .single();
+
+        if (error) return { data: null, error };
+        return { data, error: null };
+
+    } catch (error) {
+        return { data: null, error };
+    }
+}
+
+
 }

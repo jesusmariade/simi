@@ -1,0 +1,99 @@
+<!--link funciona-->
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica Simi - Editar Estado paciente</title>
+    <link rel="stylesheet" href="../../styles/components.css">
+</head>
+<body>
+    <div id="header-container"></div>
+    <main>
+            <div class="encabezado">
+            <h1 id="titulo">Actualizar estado del paciente: [nombre_completo]</h1>
+            <p>Registrar ultimo estado del paciente</p>
+            </div>
+            <div class="parte-para-actualizar">
+                <form id="form-estado">
+                    <!--solo ocupo uno awesome-->
+                    <div class="edit-estado-paciente">
+                    <label for="descripcion_deestado">Descripcion de estado:</label>
+                    <input type="text" id="descripcion_deestado" name="descripcion_deestado" value="[descripcion_deestado]" required><br>
+                    </div>
+                    <div class="botoncitos">
+                        <button class="actualizar-estado-dato" type="submit">actualizar</button>
+                        <button onclick="location.href='pacientes.html'">Cancelar</button>
+                    </div>
+                </form>
+                
+            </div>
+    </main>
+    <div id="footer-container"></div>
+    <script type="module">
+        import {PacienteController} from '../../controllers/PacienteController.js';
+        
+        window.addEventListener('DOMContentLoaded', async () => {
+            const curp = localStorage.getItem('curp_paciente');
+            const titulo = document.getElementById('titulo')
+            if(!curp){
+            console.error('no se encontro curp',error);
+            return;
+         }
+         
+        //traer datos con controlador
+        const { paciente,error} = await PacienteController.obtenerEstadoPaciente(curp);
+        if(error){
+            console.log('fallo traer datos',error)
+            return{paciente:null,error}
+        }
+        //para mis inputs del formulario
+        document.getElementById("descripcion_deestado").value = paciente.descripcion_deestado;
+        const nombre_completo = paciente.nombre_completo;
+        
+        if(titulo){
+                titulo.textContent = `Actualizar estado del paciente:  ${nombre_completo}(${curp})`
+            }
+
+        if(!nombre_completo){
+            console.error("no se recibio nombre",error)
+        }
+
+        //parte de mis botoncitos
+        const form = document.getElementById("form-estado");
+        
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            //mi arreglo para guardar los nuevos datos
+            const estadoActualizado = {
+                descripcion_deestado: form.descripcion_deestado.value,
+
+            };
+            const {paciente: resultado, error} = await PacienteController.ActualizarEstado(curp, estadoActualizado);
+            if(error){
+                alert('No se pudo actualizar el estado');
+                console.error('Pus no se pudo', error)
+                return;
+            }
+            alert('datos actualizados');
+            window.location.href='pacientes.html';
+        });
+    });
+    </script>
+    <script>
+         //cargar header
+        fetch('../../../header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error al cargar el header', error));
+        //cargar el footer
+        fetch('../../../footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error al cargar el footer', error));
+    </script>
+</body>
+</html>

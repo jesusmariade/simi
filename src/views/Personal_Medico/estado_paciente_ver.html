@@ -1,0 +1,76 @@
+<!--Link funciona-->
+<h1 hidden>you dont have to be like everybody else, recognize that i could be the eye, te eye of the storm</h1>
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinica Simi - Estado paciente</title>
+    <link rel="stylesheet" href="../../styles/components.css">
+</head>
+<body>
+    <div id="header-container"></div>
+    <main>
+       <div class="encabezado">
+        <h1 id="titulo">Estado Actual del Paciente: [nombre_completo]</h1>
+        <p>Este es el ultimo estado registrado del paciente</p>
+    </div>  
+    <div class="cuadrito">
+        <h2>Descripcion de estado</h2>
+        <h3 id="estado">[descripcion_deestado]</h3>
+        <div class="boton">
+            <button onclick="location.href='citas-medico.html'">Regresar</button>
+        </div>
+    </div>
+    </main>
+    <div id="footer-container"></div>
+    <script type="module">
+        import {PacienteController} from '../../controllers/PacienteController.js';
+        
+        window.addEventListener('DOMContentLoaded', async () => {
+            const curp = localStorage.getItem('curp_paciente');
+            const titulo = document.getElementById('titulo')
+            const estado = document.getElementById('estado')
+            if(!curp){
+            console.error('no se encontro curp',error);
+            return;
+         }
+         
+        //traer datos con controlador
+        const { paciente,error} = await PacienteController.obtenerEstadoPaciente(curp);
+        if(error){
+            console.log('fallo traer datos',error)
+            return{paciente:null,error}
+        }
+        //para que salgan los datos
+        const descripcion_deestado = paciente.descripcion_deestado;
+        const nombre_completo = paciente.nombre_completo;
+        
+        if(titulo){
+                titulo.textContent = `Estado Actual del Paciente:  ${nombre_completo}(${curp})`
+            }
+        if(estado){
+            estado.textContent =`${descripcion_deestado}`
+        }
+        if(!nombre_completo){
+            console.error("no se recibio nombre",error)
+        }
+    });
+    </script>
+    <script>
+         //cargar header
+        fetch('../../../header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error al cargar el header', error));
+        //cargar el footer
+        fetch('../../../footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error al cargar el footer', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!--link ya funciona-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar cita</title>
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <style>
+    .calendario {
+      width: 280px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 10px #0003;
+      margin-top: 10px;
+    }
+    .calendario-header {
+      display:flex;
+      justify-content:space-between;
+      font-weight:bold;
+      margin-bottom:10px;
+    }
+    .dias-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      text-align:center;
+      gap:5px;
+    }
+    .dia{
+      padding:6px;
+      cursor:pointer;
+      border-radius:5px;
+    }
+    .dia:hover{ background:#dfe9ff; }
+    .dia-ocupado{ background:#ffb3b3; color:#900; cursor:not-allowed; }
+    .dia-licencia{ background:#ffd4a8; color:#a64b00; cursor:not-allowed; }
+    .dia-hoy{ border:2px solid #2e7dff; font-weight:bold; border-radius:6px; }
+    .hidden{ display:none; }
+  </style>
+</head>
+<body>
+  <div id="header-container"></div>
+  <main>
+    <div class="encabezado-citas-agregar">
+      <h1 id="paciente-nombre">Editar cita del paciente: [nombre_paciente]</h1>
+      <h2>¡Recuerda AHORA SI verificar los datos antes de editar la cita!</h2>
+      <button class="botonregreso" onclick="location.href='../cita-paciente.html'">Regresar</button>
+    </div>
+
+    <section class="form-section">
+      <div class="agregar-medico-general">
+        <form id="form-cita">
+          <div class="curp-cita">
+            <label for="curp_paciente">CURP del paciente</label>
+            <input type="text" id="curp_paciente" name="curp_paciente" required>
+          </div>
+
+          <div class="medico-cita">
+            <label>Medico solicitado:
+              <select id="codigo_medico" name="codigo_medico" required>
+                <option value="">Cargando medicos...</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="fecha-cita">
+            <label for="fecha">Fecha de la cita:</label>
+            <input id="fecha" name="fecha" type="text" autocomplete="off">
+            <div id="calendario-container" class="calendario hidden"></div>
+          </div>
+
+          <div class="horario-cita">
+            <label for="horario">Horario de la cita:</label>
+            <select id="horario" name="horario" required>
+              <option value="" disabled selected>Selecciona un horario</option>
+            </select>
+          </div>
+
+          <div class="turno-cita">
+            <label for="turno">Turno:</label>
+            <!-- mantengo el id "form-control" porque aparece en tu HTML original -->
+            <select id="form-control" name="turno" required>
+              <option value="">Seleccione una opcion..</option>
+              <option value="Matutino">Matutino</option>
+              <option value="Vespertino">Vespertino</option>
+            </select>
+          </div>
+
+          <div class="botones-medico">
+            <button type="submit" class="agregar-medico">Guardar</button>
+            <button type="button" onclick="location.href='../cita-paciente.html'" class="cancelar-medico">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-container"></div>
+   <script>
+    // Scripts auxiliares: cargar header/footer y nombres en título
+    /*window.addEventListener('DOMContentLoaded', () => {
+      const nombre_completo = localStorage.getItem('nombre_completo');
+      const titulo = document.getElementById('paciente-nombre');
+      if (titulo && nombre_completo) titulo.textContent = `Editar cita del paciente: ${nombre_completo}`;
+
+      const curp = localStorage.getItem("curp");
+      const inputCurp = document.getElementById("curp_paciente");
+      if (curp && inputCurp) inputCurp.value = curp;
+    });*/
+
+    fetch('../../../../header.html')
+      .then(r => r.text()).then(t => document.getElementById('header-container').innerHTML = t)
+      .catch(e => console.error('Error al cargar el header', e));
+
+    fetch('../../../../footer.html')
+      .then(r => r.text()).then(t => document.getElementById('footer-container').innerHTML = t)
+      .catch(e => console.error('Error al cargar el footer', e));
+  </script>
+  <script type="module">
+  import { CitaController } from "/src/controllers/CitaController.js";
+  import { MedicoController } from "/src/controllers/MedicoController.js";
+  import { LicenciaController } from "/src/controllers/LicenciaController.js";
+
+  // Exponer controladores (si hay otros scripts que los usan)
+  window.CitaController = CitaController;
+  window.MedicoController = MedicoController;
+  window.LicenciaController = LicenciaController;
+
+  // estado
+  let calendarioMes = new Date().getMonth();
+  let calendarioAnio = new Date().getFullYear();
+  let diasOcupados = [];
+  let diasLicencia = [];
+
+  // Horario que estaba guardado en la BD (normalizado a 'HH:MM')
+  let horarioOriginal = null;
+
+  const selectMedico = document.getElementById("codigo_medico");
+  const inputFecha = document.getElementById("fecha");
+  const selectHorario = document.getElementById("horario");
+  const selectTurno = document.getElementById("form-control");
+
+  // --- Calendario (muestra/oculta y marca días ocupados / de licencia) ---
+  async function cargarCalendarioDelMedico() {
+    const codigoMedico = selectMedico.value;
+    if (!codigoMedico) return;
+
+    diasOcupados = [];
+    diasLicencia = [];
+
+    // Traer todas las citas del médico
+    const { cita, error: errorCitas } = await CitaController.CargarCitaspormedico(codigoMedico);
+    if (!errorCitas && cita && cita.length > 0) {
+      const ALL_HORARIOS = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00"];
+      const ocupadosPorDia = {};
+
+      cita.forEach(c => {
+        if (c.cancelada) return;
+        const fecha = c.fecha;
+        const horario = (c.horario || "").slice(0,5);
+        if (!fecha) return;
+        if (!ocupadosPorDia[fecha]) ocupadosPorDia[fecha] = new Set();
+        if (horario) ocupadosPorDia[fecha].add(horario);
+      });
+
+      diasOcupados = Object.keys(ocupadosPorDia).filter(fecha => {
+        return ALL_HORARIOS.every(h => ocupadosPorDia[fecha].has(h));
+      });
+    } else {
+      diasOcupados = [];
+    }
+
+    // Traer licencias
+    const { licencia, error: errorLic } = await LicenciaController.CargarLicenciaPorMedico(codigoMedico);
+    if (!errorLic && licencia && licencia.length > 0) {
+      licencia.forEach(L => {
+        const inicio = new Date(L.fecha_inicio);
+        const fin = new Date(L.fecha_fin);
+        let f = new Date(inicio);
+        while (f <= fin) {
+          diasLicencia.push(f.toISOString().split("T")[0]);
+          f.setDate(f.getDate() + 1);
+        }
+      });
+    }
+
+    generarCalendario(calendarioMes, calendarioAnio);
+  }
+
+  function generarCalendario(mes, anio) {
+    const cont = document.getElementById("calendario-container");
+    cont.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.className = "calendario-header";
+    header.innerHTML = `
+      <button id="prevMes">◀</button>
+      <span>${mes + 1} / ${anio}</span>
+      <button id="nextMes">▶</button>
+    `;
+    cont.appendChild(header);
+
+    const grid = document.createElement("div");
+    grid.className = "dias-grid";
+
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const diasMes = new Date(anio, mes + 1, 0).getDate();
+
+    for (let i = 0; i < primerDia; i++){
+      const vacio = document.createElement("div");
+      grid.appendChild(vacio);
+    }
+
+    for (let d = 1; d <= diasMes; d++){
+      const fecha = `${anio}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      const div = document.createElement("div");
+      div.className = "dia";
+      div.textContent = d;
+
+      const hoy = new Date();
+      if (d === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear()){
+        div.classList.add("dia-hoy");
+      }
+
+      if (diasOcupados.includes(fecha)){
+        div.classList.add("dia-ocupado");
+      }
+
+      if (diasLicencia.includes(fecha)){
+        div.classList.add("dia-licencia");
+      }
+
+      div.addEventListener("click", () => {
+        if (div.classList.contains("dia-ocupado") || div.classList.contains("dia-licencia")) return;
+        inputFecha.value = fecha;
+        inputFecha.dispatchEvent(new Event("change"));
+        cont.classList.add("hidden");
+      });
+
+      grid.appendChild(div);
+    }
+
+    cont.appendChild(grid);
+
+    document.getElementById("prevMes").onclick = async () => {
+      calendarioMes--;
+      if (calendarioMes < 0) { calendarioMes = 11; calendarioAnio--; }
+      generarCalendario(calendarioMes, calendarioAnio);
+      
+    };
+
+    document.getElementById("nextMes").onclick = async () => {
+      calendarioMes++;
+      if (calendarioMes > 11) { calendarioMes = 0; calendarioAnio++; }
+      generarCalendario(calendarioMes, calendarioAnio);
+      
+    };
+  }
+
+  // mostrar calendario al enfocar la fecha
+  inputFecha.addEventListener("focus", () => {
+    document.getElementById("calendario-container").classList.remove("hidden");
+  });
+
+  // --- Horarios disponibles (se calcula desde las citas del médico) ---
+  const ALL_HORARIOS = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00"];
+
+  async function cargarHorariosDisponibles() {
+    const fecha = inputFecha.value;
+    const medico = selectMedico.value;
+
+    if (!fecha || !medico) {
+      selectHorario.innerHTML = `<option value="">Selecciona una fecha y médico</option>`;
+      return;
+    }
+
+    selectHorario.innerHTML = `<option disabled>Cargando horarios...</option>`;
+
+    // obtenemos todas las citas del medico
+    const { cita, error } = await CitaController.CargarCitaspormedico(medico);
+    if (error || !Array.isArray(cita)) {
+      selectHorario.innerHTML = `<option disabled>Error obteniendo horarios</option>`;
+      return;
+    }
+
+    // horarios ocupados en la fecha (normalizados)
+    const ocupados = cita
+      .filter(c => c.fecha === fecha)
+      .map(c => (c.horario || "").slice(0,5));
+
+    // disponibles: los de ALL_HORARIOS que no estén ocupados,
+    // PERO incluir el horarioOriginal (si existe) aunque aparezca en ocupados
+    const disponibles = ALL_HORARIOS.filter(h => (!ocupados.includes(h)) || (h === horarioOriginal));
+
+    if (disponibles.length === 0) {
+      selectHorario.innerHTML = `<option disabled>No hay horarios disponibles</option>`;
+      return;
+    }
+
+    selectHorario.innerHTML = `<option value="">Seleccione un horario</option>`;
+    disponibles.forEach(h => {
+      const opt = document.createElement("option");
+      opt.value = h;
+      opt.textContent = h;
+      selectHorario.appendChild(opt);
+    });
+
+    // si estamos editando, seleccionar el original (si existe)
+    if (horarioOriginal) {
+      selectHorario.value = horarioOriginal;
+      // y ajustar turno visualmente
+      ajustarTurnoSegunHorario(horarioOriginal);
+    }
+  }
+
+  // Ajusta el turno según el horario elegido:
+  // horarios < "12:00" -> Matutino, horarios >= "12:00" -> Vespertino
+  function ajustarTurnoSegunHorario(hhmm) {
+    if (!hhmm) return;
+    const hour = parseInt(hhmm.split(":")[0], 10);
+    if (hour >= 12) {
+      selectTurno.value = "Vespertino";
+    } else {
+      selectTurno.value = "Matutino";
+    }
+  }
+
+  // cuando el usuario cambia el horario elegir turno automáticamente
+  selectHorario.addEventListener("change", (e) => {
+    ajustarTurnoSegunHorario(e.target.value);
+  });
+
+  // cuando cambia médico: recargar calendario y horarios (si hay fecha)
+  selectMedico.addEventListener("change", async () => {
+    await cargarCalendarioDelMedico();
+    await cargarHorariosDisponibles();
+  });
+
+  // cuando cambia la fecha: recargar horarios
+  inputFecha.addEventListener("change", async () => {
+    await cargarHorariosDisponibles();
+  });
+
+  // --- Cargar médicos y datos de la cita a editar ---
+  const id_cita = localStorage.getItem("id_cita");
+  if (!id_cita) {
+    alert("No se seleccionó ninguna cita.");
+    location.href = "../cita-paciente.html";
+  }
+
+  // Cargar médicos (asegurar que los values sean strings)
+// Cargar médicos (asegurar que los values sean strings)
+// Cargar médicos (asegurar que los values sean strings)
+async function cargarMedicos() {
+  const select = selectMedico;
+  const { medicos, error } = await MedicoController.CargarMedicos();
+  if (error || !Array.isArray(medicos)) {
+    select.innerHTML = `<option>Error cargando médicos</option>`;
+    return;
+  }
+  select.innerHTML = `<option value="">Seleccione...</option>`;
+  
+  // Si hay un médico de la cita y no está en la lista, agregarlo primero
+  if (window._medicoOriginal && !medicos.find(m => String(m.codigo) === String(window._codigoMedicoCita))) {
+    const optionOriginal = document.createElement("option");
+    optionOriginal.value = String(window._medicoOriginal.codigo);
+    optionOriginal.textContent = `${window._medicoOriginal.nombre_completo} (Médico original - ya no disponible)`;
+    optionOriginal.style.color = "#cc0000";
+    select.appendChild(optionOriginal);
+  }
+  
+  medicos.forEach(m => {
+    const option = document.createElement("option");
+    option.value = String(m.codigo);
+    option.textContent = m.nombre_completo;
+    select.appendChild(option);
+  });
+
+  console.log("Médicos cargados:", medicos.map(m => ({ 
+    codigo: m.codigo, 
+    tipo: typeof m.codigo 
+  })));
+
+  // Esperar un tick para que el DOM se actualice completamente
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  // si ya se cargó la cita y sabemos cuál es su médico:
+  if (window._codigoMedicoCita) {
+    console.log("Intentando seleccionar médico:", window._codigoMedicoCita);
+    console.log("Opciones disponibles:", Array.from(select.options).map(o => o.value));
+    
+    selectMedico.value = String(window._codigoMedicoCita);
+    
+    if (selectMedico.value === "") {
+      console.error("⚠️ ADVERTENCIA: El médico original (código " + window._codigoMedicoCita + ") ya no está disponible.");
+      console.error("Por favor, selecciona un nuevo médico para esta cita.");
+      alert("El médico original de esta cita ya no está disponible. Por favor, selecciona un nuevo médico.");
+    } else {
+      console.log("✓ Médico seleccionado correctamente:", selectMedico.value);
+      selectMedico.dispatchEvent(new Event("change"));
+    }
+  }
+}
+
+// Cargar datos de la cita existente (selecciona médico correctamente)
+async function cargarDatosCita() {
+  const { cita, error } = await CitaController.obtenerCitaPorId(id_cita);
+  if (error || !cita) {
+    alert("No se pudo cargar la cita.");
+    return;
+  }
+
+  // guardamos horario original normalizado a HH:MM
+  horarioOriginal = (cita.horario || "").slice(0,5);
+
+  // rellenamos CURP y fecha
+  document.getElementById("curp_paciente").value = cita.curp_paciente || "";
+  inputFecha.value = cita.fecha || "";
+
+  // actualizamos turno (temporal)
+  selectTurno.value = cita.turno || "";
+
+  console.log(typeof cita.codigo_medico, cita.codigo_medico)
+
+  // Seleccionar médico: convertir a string por seguridad
+  const codigoMedStr = String(cita.codigo_medico || "");
+
+  // Guardar temporalmente el código del médico de la cita
+    window._codigoMedicoCita = codigoMedStr;
+
+
+  
+
+  // seleccionar el horario ORIGINAL
+if (horarioOriginal) {
+    selectHorario.value = horarioOriginal;
+}
+
+// seleccionar también el TURNO ORIGINAL
+if (cita.turno) {
+    selectTurno.value = cita.turno;
+}
+
+// ajustar turno automático por si el horario cambia
+ajustarTurnoSegunHorario(selectHorario.value);
+
+}
+
+
+  // --- Guardar cambios ---
+  const form = document.getElementById("form-cita");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const citaData = {
+      curp_paciente: form.curp_paciente.value,
+      codigo_medico: form.codigo_medico.value,
+      fecha: form.fecha.value,
+      horario: form.horario.value,
+      turno: form.turno.value
+    };
+
+    const { data, error } = await CitaController.actualizarCita(id_cita, citaData);
+    if (error) {
+      alert("Error al actualizar la cita.");
+      console.error(error);
+      return;
+    }
+
+    alert("Cita actualizada correctamente.");
+    location.href = "../cita-paciente.html";
+  });
+
+  // inicialización al cargar la página
+  /*document.addEventListener("DOMContentLoaded", async () => {
+    await cargarDatosCita();
+    await cargarMedicos();
+  });*/
+
+  //
+  document.addEventListener("DOMContentLoaded", async () => {
+  // 1. Mostrar nombre del paciente
+  const nombre_completo = localStorage.getItem('nombre_completo');
+  if (nombre_completo) {
+      document.getElementById('paciente-nombre').textContent =
+          `Editar cita del paciente: ${nombre_completo}`;
+  }
+
+  // 2. Cargar datos de la cita (primer paso SIEMPRE)
+  await cargarDatosCita();   // aquí se guarda window._codigoMedicoCita
+
+  // 3. Cargar médicos (selecciona automáticamente el correcto)
+  await cargarMedicos();     // aquí se ejecuta selectMedico.value = _codigoMedicoCita
+
+  // 4. Cargar calendario para ese médico
+  await cargarCalendarioDelMedico();
+
+  // 5. Cargar horarios disponibles para esa fecha (incluyendo horario original)
+  await cargarHorariosDisponibles();
+});
+
+
+  </script>
+</body>
+</html>

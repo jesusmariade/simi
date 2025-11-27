@@ -1,5 +1,6 @@
 // src/controllers/SucursalController.js
 import { SucursalService } from '../services/SucursalService.js';
+import supabase from '../../supabase/supabaseClient.js';
 import { Sucursal } from '../models/Sucursal.js';
 
 export class SucursalController {
@@ -49,15 +50,27 @@ export class SucursalController {
         });
     }
 
-    static seleccionarSucursal(sucursalId, sucursalNombre) {
-        localStorage.setItem('sucursalId', sucursalId);
+    
+static async seleccionarSucursal(sucursalId, sucursalNombre) 
+{    localStorage.setItem('sucursalId', sucursalId);   
         localStorage.setItem('sucursalNombre', sucursalNombre);
-        
-        console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
-        
-        // Redirigir a bienvenido
-        window.location.href = 'bienvenido.html';
+
+        const { data: farmacia, error } = await supabase
+        .from('farmacia')
+        .select('id_farmacia')
+        .eq('n_sucursal', parseInt(sucursalId))
+        .limit(1)
+        .single();
+    
+    if (!error && farmacia) {
+        localStorage.setItem('idFarmacia', farmacia.id_farmacia.toString());
+    } else {
+        localStorage.setItem('idFarmacia', '1');
     }
+    console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
+    
+    window.location.href = 'bienvenido.html';
+}
 
     static async inicializar() {
         const container = document.getElementById('sucursales-container');

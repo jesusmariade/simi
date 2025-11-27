@@ -7,6 +7,11 @@ export class Receta {
         
         // Se usa false por defecto 
         this.surtida = data.surtida || false;
+        
+        // Datos del JOIN
+        this.cita = data.cita || null;
+        this.paciente = data.cita?.paciente || null;
+        this.medico = data.cita?.medico || null;
     }
 
     static fromJSON(data) {

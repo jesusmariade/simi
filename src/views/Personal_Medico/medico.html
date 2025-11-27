@@ -108,7 +108,7 @@
                      <td>${medico.especialidad}</td>
                      <td>${medico.numero_sucursal}</td>
                      <td>
-                        <button class="citas-medico" data-codigo="${medico.codigo}">ver citas</button>
+                        <button class="citas-medico" data-codigo="${medico.codigo}" data-nombre_completo="${medico.nombre_completo}">ver citas</button>
                         <button class="editar-medico" data-codigo="${medico.codigo}">Editar medico</button>
                         <button class="eliminar-medico" data-codigo="${medico.codigo}">Eliminar Medico</button>
                     </td>
@@ -123,6 +123,7 @@
                 document.querySelectorAll(".citas-medico").forEach(btn => {
                     btn.addEventListener("click", () => {
                         localStorage.setItem("codigo_medico",btn.dataset.codigo);
+                        localStorage.setItem("nombre_completo",btn.dataset.nombre_completo);
                         location.href = "citas-medico.html";
                     });
                 });

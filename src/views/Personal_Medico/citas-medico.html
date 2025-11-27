@@ -1,5 +1,6 @@
-<!--link funciona-->
+<!-- Archivo corregido con IDs opción B -->
 <!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,23 @@
     <link rel="stylesheet" href="../../styles/components.css">
 </head>
 <body>
-    <!--header-->
     <div id="header-container"></div>
+
     <main>
         <div class="bienvenida-medico"><br>
-        <h2>Bienvenido Doctor [nombre_completo]</h2>
-        <div class="boton-medico">
-            <button onclick="location.href='medico.html'">Regresar</button>
+            <h2 id="nombre-doctor">Bienvenido Doctor [nombre_completo]</h2>
+            <div class="boton-medico">
+                <button onclick="location.href='medico.html'">Regresar</button>
+            </div>
         </div>
-    </div>
-    <br>
-    <div class="contenido-medico">
-        <div class="citas-del-medico">
-            <h2>Citas Agendadas</h2>
-                <table>
+
+        <br>
+        <div class="contenido-medico">
+
+            <!-- Citas Futuras -->
+            <div class="citas-del-medico">
+                <h2>Citas Agendadas</h2>
+                <table id="tabla-citas-futuras">
                     <thead>
                         <tr>
                             <th>ID Cita</th>
@@ -29,82 +33,283 @@
                             <th>Fecha</th>
                             <th>Horario</th>
                             <th>Turno</th>
-                            <!--<th>Cancelada?</th>-->
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>[id_cita]</td>
-                            <td>[curp_paciente]</td>
-                            <td>[codigo_medico]</td>
-                            <td>[fecha]</td>
-                            <td>[horario]</td>
-                            <td>[turno]</td>
-                            <!--<td>[cancelada]</td>-->
-                            <td>
-                                <button onclick="location.href=''">Actualizar estado del paciente</button>
-                                <button onclick="location.href='Receta_medico/agregarreceta.html?id_cita=1'">Registrar receta</button>
-                                <button onclick="location.href='Receta_medico/editarreceta.html?id_cita=1'">Editar receta</button>        
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
-        </div>
-        <br>
-        <div class="licencia">
-            <div class="lista-licencias">
+            </div>
+
+            <br>
+
+            <!-- Citas Pasadas -->
+            <div class="citas-del-medico">
+                <h2>Citas Pasadas</h2>
+                <table id="tabla-citas-pasadas">
+                    <thead>
+                        <tr>
+                            <th>ID Cita</th>
+                            <th>CURP Paciente</th>
+                            <th>Codigo Medico</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Turno</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <br>
+
+            <!-- Licencias -->
+            <div class="licencia">
                 <h2>Licencias Tomadas</h2>
-                <ul>
-                    <div class="boton-licencia">
-                    <button onclick="location.href='/src/views/Personal_Medico/Licencias_Medico/licenciasmedico.html'">Solicitar licencia</button>
-                    </div>
-                </ul>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID Licencia</th>
-                                <th>Fecha de inicio</th>
-                                <th>Fecha de fin</th>
-                                <th>Total de Días</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>[id_licencia]</td>
-                                <td>[fecha_inicio]</td>
-                                <td>[fecha_fin]</td>
-                                <td>[duracion_dias]</td>
-                                <td>
-                                    <div class="licencia-botones">
-                                    <button onclick="location.href='/src/views/Personal_Medico/Licencias_Medico/editarlicencia.html'">Editar licencia</button>
-                                    <button>Eliminar licencia</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="boton-licencia">
+                    <button onclick="guardarYEnviarLicencia()">Solicitar licencia</button>
+                </div>
+
+                <table id="tabla-licencias">
+                    <thead>
+                        <tr>
+                            <th>ID Licencia</th>
+                            <th>Fecha inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Total días</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
-    </div>
     </main>
-    <!--footer-->
+
     <div id="footer-container"></div>
-    <script>
-        //cargar header
-        fetch('/../../../header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-container').innerHTML = data;
-        })
-        .catch(error => console.error('Error al cargar el header', error));
-        //cargar footer
-        fetch('/../../../footer.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('footer-container').innerHTML = data;
-        })
-        .catch(error => console.error('Error al cargar el footer', error));
+
+    <!-- SCRIPT: Mostrar Nombre del Doctor -->
+    <script type="module">
+        window.addEventListener("DOMContentLoaded", () => {
+            const nombre = localStorage.getItem("nombre_completo");
+            if (nombre) {
+                document.getElementById("nombre-doctor").textContent = `Bienvenido Doctor ${nombre}`;
+            }
+        });
     </script>
+
+    <!-- SCRIPT: Citas -->
+    <script type="module">
+        import { CitaController } from "../../controllers/CitaController.js";
+        import { RecetaController } from "../../controllers/RecetaController.js";
+
+        document.addEventListener("DOMContentLoaded", cargarCitas);
+
+        async function cargarCitas() {
+            const codigo = localStorage.getItem("codigo_medico");
+            if (!codigo) return console.error("No hay código del médico");
+
+            const { cita, error } = await CitaController.CargarCitaspormedico(codigo);
+            if (error) return console.error(error);
+
+            renderizarCitas(cita);
+            activarBotonesReceta(cita);
+        }
+
+        function renderizarCitas(citas) {
+            const hoy = new Date().toISOString().split("T")[0];
+
+            const tbodyFuturas = document.querySelector("#tabla-citas-futuras tbody");
+            const tbodyPasadas = document.querySelector("#tabla-citas-pasadas tbody");
+
+            tbodyFuturas.innerHTML = "";
+            tbodyPasadas.innerHTML = "";
+
+            citas.forEach(cita => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${cita.id_cita}</td>
+                    <td>${cita.curp_paciente}</td>
+                    <td>${cita.codigo_medico}</td>
+                    <td>${cita.fecha}</td>
+                    <td>${cita.horario}</td>
+                    <td>${cita.turno}</td>
+                    <td class="acciones"></td>`;
+
+                const acciones = tr.querySelector(".acciones");
+
+                if (cita.fecha < hoy) {
+                    acciones.innerHTML = `
+                        <button class="estado-btn" data-id="${cita.id_cita}" data-curp="${cita.curp_paciente}">Actualizar estado</button><br>
+                        <button class="agregar-receta-btn" data-id="${cita.id_cita}">Registrar receta</button>
+                        <button class="ver-receta-btn" data-id="${cita.id_cita}" style="display:none;">Ver receta</button>
+                        <!--<button class="editar-receta-btn" data-id="${cita.id_cita}" >Editar receta</button>-->`;
+
+                    tbodyPasadas.appendChild(tr);
+                } else {
+                    acciones.innerHTML = `
+                        <button class="ver-estado-btn" data-id="${cita.id_cita}" data-curp="${cita.curp_paciente}">ver estado</button>`;
+                    tbodyFuturas.appendChild(tr);
+                }
+            });
+
+            activarBotones();
+        }
+
+        function activarBotones() {
+
+            document.querySelectorAll(".ver-estado-btn").forEach(btn =>{
+                btn.addEventListener("click", () => {
+                   const id = btn.dataset.id;     // id_cita
+                    const curp = btn.dataset.curp; // curp del paciente
+
+                    localStorage.setItem("id_cita", id);
+                    localStorage.setItem("curp_paciente", curp);
+
+                    location.href = "estado_paciente_ver.html?id_cita=" + id;
+                });
+            })
+            //actualizar estado, intento pasar el nombre del paciente aunque la tabla solo tiene su curp
+            document.querySelectorAll(".estado-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;     // id_cita
+                    const curp = btn.dataset.curp; // curp del paciente
+
+                    localStorage.setItem("id_cita", id);
+                    localStorage.setItem("curp_paciente", curp);
+
+                    location.href = "estado_paciente.html?id_cita=" + id;
+                });
+            });
+
+
+            document.querySelectorAll(".agregar-receta-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    localStorage.setItem("id_cita", id);
+                    location.href = "Receta_medico/agregarreceta.html?id_cita=" + id;
+                });
+            });
+
+            /*document.querySelectorAll(".editar-receta-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    localStorage.setItem("id_cita", id);
+                    location.href = "Receta_medico/editarreceta.html?id_cita=" + id;
+                });
+            });*/
+
+            document.querySelectorAll(".ver-receta-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    localStorage.setItem("id_cita", id);
+                    location.href = "Receta_medico/verreceta.html?id_cita=" + id;
+                });
+            });
+        }
+
+       async function activarBotonesReceta(citas) {
+        for (const cita of citas) {
+            const agregar = document.querySelector(`.agregar-receta-btn[data-id="${cita.id_cita}"]`);
+            const ver = document.querySelector(`.ver-receta-btn[data-id="${cita.id_cita}"]`);
+            //const editar = document.querySelector(`.editar-receta-btn[data-id="${cita.id_cita}"]`);
+            
+            if (!agregar) continue;  // si no existe el botón, pasa a la siguiente cita
+
+            const { receta } = await RecetaController.obtenerRecetaporId(cita.id_cita);
+            const existe = receta && receta.length > 0;
+            if (existe) {
+                agregar.style.display = "none";
+
+                if (ver) ver.style.display = "inline-block";
+                //if (editar) editar.style.display = "inline-block";
+
+                } else {
+                agregar.style.display = "inline-block";
+
+                if (ver) ver.style.display = "none";
+                //if (editar) editar.style.display = "none";
+             }   
+        }
+        }
+
+    </script>
+
+    <!-- Script licencias -->
+    <script type="module">
+        import { LicenciaController } from '../../controllers/LicenciaController.js';
+
+        document.addEventListener("DOMContentLoaded", cargarLicencias);
+
+        async function cargarLicencias() {
+            const codigo = localStorage.getItem("codigo_medico");
+            if (!codigo) return;
+
+            const { licencia } = await LicenciaController.CargarLicenciaPorMedico(codigo);
+            renderizarLicencias(licencia);
+        }
+
+        function renderizarLicencias(lista) {
+            const tbody = document.querySelector("#tabla-licencias tbody");
+            tbody.innerHTML = "";
+
+            if (!lista || lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5">No se han registrado licencias.</td></tr>`;
+                return;
+            }
+
+            lista.forEach(lic => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${lic.id_licencia}</td>
+                    <td>${lic.fecha_inicio}</td>
+                    <td>${lic.fecha_fin}</td>
+                    <td>${lic.duracion_dias}</td>
+                    <td>
+                        <button class="editar-btn" data-id="${lic.id_licencia}">Editar</button>
+                        <button class="eliminar-btn" data-id="${lic.id_licencia}">Eliminar</button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+
+            activarBotonesLicencias();
+        }
+
+        function activarBotonesLicencias() {
+            document.querySelectorAll(".editar-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.id;
+                    localStorage.setItem("id_licencia", id);
+                    location.href = "/src/views/Personal_Medico/Licencias_Medico/editarlicencia.html?id=" + id;
+                });
+            });
+
+            document.querySelectorAll(".eliminar-btn").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const id = btn.dataset.id;
+                    if (!confirm("¿Seguro que deseas eliminar esta licencia?")) return;
+                    await LicenciaController.eliminarLicencia(id);
+                    location.reload();
+                });
+            });
+        }
+    </script>
+
+    <script>
+        function guardarYEnviarLicencia() {
+            location.href = "/src/views/Personal_Medico/Licencias_Medico/licenciasmedico.html";
+        }
+    </script>
+
+    <script>
+        fetch('../../../header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('header-container').innerHTML = data);
+
+        fetch('../../../footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('footer-container').innerHTML = data);
+    </script>
+
 </body>
 </html>

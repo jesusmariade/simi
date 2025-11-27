@@ -12,32 +12,104 @@
             <section class="form-section">
                 <h2>Solicitar Licencia Médica</h2>
                 <div class="licencia-medico">
-                <form action="#" method="post"></form>
+                <form id="form-licencia">
                     <!--Inicio-->
                     <div class="inicio-licencia">
-                    <label for="fecha-inicio">Fecha de Inicio:</label>
-                    <input type="date" id="fecha-inicio" name="fecha-inicio" required><br><br>
+                    <label for="fecha_inicio">Fecha de Inicio:</label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" required><br><br>
                     </div>
                     <!--Fin-->
                     <div class="fin-licencia">
-                    <label for="fecha-fin">Fecha de Fin:</label>
-                    <input type="date" id="fecha-fin" name="fecha-fin" required><br><br>
+                    <label for="fecha_fin">Fecha de Fin:</label>
+                    <input type="date" id="fecha_fin" name="fecha_fin" required><br><br>
                     </div>
                     <!--Días-->
                     <div class="duracion-licencia">
                     <label for="duracion_dias">Total de Días</label><br>
                     <input type="number" id="duracion_dias" name="duracion_dias" rows="4" cols="50" required><br><br>
-                    <div>
+                    </div>
                         <div class="botones-medico">
-                            <button onclick="location.href='/src/views/Personal_Medico/citas-medico.html'" class="agregar-medico">Agregar</button>
+                            <button class="cancelar-medico" type='submit'>Agregar</button>
                             <button onclick="location.href='/src/views/Personal_Medico/citas-medico.html'" class="cancelar-medico">Cancelar</button>
                         </div>
+                </form>
                 </div>
             </section>
         </main>
         <!--footer-->
         <div id="footer-container"></div>
        <!--cargar componentes-->
+        <script type="module">
+            const codigo_medico = localStorage.getItem("codigo_medico");
+            //COSOS DEL CONTROLLER JEJEJEJE
+            import { LicenciaController } from '../../../controllers/LicenciaController.js';
+
+            const form = document.getElementById("form-licencia");
+            const fechainicioInput = document.getElementById("fecha_inicio");
+            const fechafinInput = document.getElementById("fecha_fin");
+            const diasInput = document.getElementById("duracion_dias")
+
+            //calcular dias que durara la licencia automaticamente
+            function calcularduracion(){
+                const inicio = new Date(fechainicioInput.value);
+                const fin = new Date(fechafinInput.value);
+
+                if(!fechainicioInput.value || !fechafinInput.value){
+                    diasInput.value = "";
+                    return;
+                }
+                if(fin<inicio){
+                    alert("La fecha de fin no puede ser mayor a la fecha de inicio");
+                    fechafinInput.value = "";
+                    diasInput.value = "";
+                    return;
+                }
+                //diferencia de dias
+                const diffTime = fin - inicio;
+                const diffDays =  Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                if(diffDays > 15){
+                    alert("Las licencias no pueden exceder los 15 dias, pillin");
+                    fechafinInput.value = "";
+                    diasInput.value = "";
+                    return;
+                }
+                diasInput.value = diffDays;
+            }
+            fechainicioInput.addEventListener('change',calcularduracion);
+            fechafinInput.addEventListener('change',calcularduracion);
+
+            
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                //si no hay duracion valida
+                if(!diasInput.value || diasInput.value <= 0 ){
+                    alert("Por favor revisa las fechas, no se pudo calcular duracion");
+                    return;
+                }
+
+                const licenciaData = {
+                    codigo_medico: localStorage.getItem("codigo_medico"),
+                    fecha_inicio: fechainicioInput.value,
+                    fecha_fin: fechafinInput.value,
+                    duracion_dias: diasInput.value,
+                };
+
+                console.log("Datos que se envían a Supabase:", licenciaData);
+
+
+                const { licencia, error} = await LicenciaController.CrearLicencia(licenciaData);
+
+                if(error) {
+                    alert("No se pudo añadir la licencia womp womp");
+                    console.error("Error al crear la licencia", error);
+                    return;
+                }
+                alert("Licencia agregada exitosamente disfruta tus vacaciones locogod :p");
+                window.location.href = "../citas-medico.html";
+            })
+        </script>
         <script>
             //cargar header
             fetch('../../../../header.html')

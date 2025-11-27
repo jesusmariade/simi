@@ -1,5 +1,6 @@
 // src/controllers/FarmaciaController.js
 import { FarmaciaService } from '../services/FarmaciaService.js';
+import { VentaMedicamentoService } from '../services/VentaMedicamentoService.js';
 import { MedicamentoService } from '../services/MedicamentoService.js';
 import { Venta } from '../models/Venta.js';
 import { Receta } from '../models/Receta.js';
@@ -46,7 +47,7 @@ export class FarmaciaController {
 
     static async cargarVentas() {
         try {
-            const idFarmacia = localStorage.getItem('idFarmacia');
+            const idFarmacia = parseInt(localStorage.getItem('idFarmacia'));
             const { data, error } = await FarmaciaService.obtenerVentas(idFarmacia);
             
             if (error) {
@@ -68,7 +69,10 @@ export class FarmaciaController {
 
     static async cargarMedicamentos() {
         try {
-            const { data, error } = await MedicamentoService.obtenerTodos();
+            const idFarmacia = parseInt(localStorage.getItem('idFarmacia'));
+            const { data, error } = idFarmacia 
+                ? await MedicamentoService.obtenerPorFarmacia(idFarmacia)
+                : await MedicamentoService.obtenerTodos();
             
             if (error) {
                 console.error('Error al cargar medicamentos:', error);
@@ -104,7 +108,7 @@ export class FarmaciaController {
         medicamentos.forEach(medicamento => {
             const option = document.createElement('option');
             option.value = medicamento.id_medicamento;
-            option.textContent = `${medicamento.nombre} - $${medicamento.precio.toFixed(2)}`;
+            option.textContent = `${medicamento.nombre} - $${medicamento.precio.toFixed(2)}${medicamento.cantidad_stock !== undefined ? ` (Stock: ${medicamento.cantidad_stock})` : ''}`;
             option.dataset.precio = medicamento.precio;
             option.dataset.nombre = medicamento.nombre;
             selectElement.appendChild(option);
@@ -115,28 +119,30 @@ export class FarmaciaController {
         const selectMedicamento = document.getElementById('select-medicamento');
         const inputCantidad = document.getElementById('input-cantidad');
         const inputPrecio = document.getElementById('input-precio');
-        const inputTotal = document.getElementById('input-total');
+        const inputSubtotal = document.getElementById('input-subtotal');
         
-        if (!selectMedicamento || !inputCantidad || !inputPrecio || !inputTotal) return;
+        if (!selectMedicamento || !inputCantidad || !inputPrecio || !inputSubtotal) return;
         
         const selectedOption = selectMedicamento.options[selectMedicamento.selectedIndex];
         const precio = parseFloat(selectedOption.dataset.precio) || 0;
         const cantidad = parseFloat(inputCantidad.value) || 0;
-        const total = precio * cantidad;
+        const subtotal = precio * cantidad;
         
         inputPrecio.value = precio.toFixed(2);
-        inputTotal.value = total.toFixed(2);
+        inputSubtotal.value = subtotal.toFixed(2);
     }
 
     static async crearVenta(ventaData) {
         try {
-            const idFarmacia = localStorage.getItem('idFarmacia') || 1;
+            const idFarmacia = parseInt(localStorage.getItem('idFarmacia')) || 1;
             const venta = {
                 id_farmacia: idFarmacia,
                 id_medicamento: parseInt(ventaData.id_medicamento),
                 fecha_venta: new Date().toISOString().split('T')[0],
+                hora_venta: new Date().toTimeString().split(' ')[0], // Agregar hora
                 total: parseFloat(ventaData.total),
-                tipo: 'venta'
+                tipo: 'venta',
+                vendedor: localStorage.getItem('usuarioNombre') || 'Farmacéutico' // Agregar vendedor
             };
             
             const { data, error } = await FarmaciaService.crearVenta(venta);
@@ -152,6 +158,28 @@ export class FarmaciaController {
             return { venta: null, error };
         }
     }
+    // 
+static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUnitario, subtotal) {
+    try {
+        const { data, error } = await VentaMedicamentoService.agregarMedicamentoAVenta(
+            idVenta,
+            idMedicamento,
+            cantidad,
+            precioUnitario,
+            subtotal
+        );
+        
+        if (error) {
+            console.error('Error al agregar medicamento a venta:', error);
+            return { success: false, error };
+        }
+        
+        return { success: true, error: null };
+    } catch (error) {
+        console.error('Error:', error);
+        return { success: false, error };
+    }
+}
 
     static async actualizarVenta(idVenta, ventaData) {
         try {
@@ -202,25 +230,26 @@ export class FarmaciaController {
         const table = document.createElement('table');
         table.className = 'tablita';
         table.innerHTML = `
-            <thead>
-                <tr>
-                    <th>ID Receta</th>
-                    <th>ID Cita</th>
-                    <th>Fecha</th>
-                    <th>Surtida</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        `;
+    <thead>
+        <tr>
+            <th>ID Receta</th>
+            <th>Paciente</th>
+            <th>Fecha</th>
+            <th>Surtida</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+`;
         
         const tbody = table.querySelector('tbody');
         
         recetas.forEach(receta => {
             const tr = document.createElement('tr');
+            const nombrePaciente = receta.paciente?.nombre_completo || 'Sin nombre';
             tr.innerHTML = `
                 <td>${receta.id_receta}</td>
-                <td>${receta.id_cita}</td>
+                <td>${nombrePaciente}</td>
                 <td>${receta.fecha_expedicion}</td>
                 <td>${receta.surtida ? 'Sí' : 'No'}</td>
                 <td></td>
@@ -263,10 +292,19 @@ export class FarmaciaController {
         ventas.forEach(venta => {
             const li = document.createElement('li');
             li.className = 'venta-item';
-            li.innerHTML = `
-                <span>ID: ${venta.id_venta} — Total: $${Number(venta.total).toFixed(2)} — Fecha: ${venta.fecha_venta}</span>
-            `;
+            const nombreMedicamento = venta.medicamento?.nombre || 'Sin medicamento';
+            const hora = venta.hora_venta || 'N/A';
+            const vendedor = venta.vendedor || 'Farmacéutico';
+            const fecha = venta.fecha_venta;
             
+            li.innerHTML = `
+                <div class="venta-info">
+                    <strong>${nombreMedicamento}</strong><br>
+                    <small>ID: ${venta.id_venta} | Total: $${Number(venta.total).toFixed(2)}</small><br>
+                    <small>Fecha: ${fecha} | Hora: ${hora}</small><br>
+                    <small>Vendido por: ${vendedor}</small>
+                </div>
+            `;
             const actions = document.createElement('div');
             actions.className = 'venta-actions';
             

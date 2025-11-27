@@ -26,7 +26,8 @@ static async agregarMedicamentoAReceta(idReceta, medicamentoData) {
             idReceta,
             medicamentoData.id_medicamento,
             medicamentoData.cantidad,
-            medicamentoData.dosis
+            medicamentoData.dosis,
+            medicamentoData.comprado,
         );
         
         if (error) {
@@ -54,6 +55,19 @@ static async cargarMedicamentos() {
     } catch (error) {
         return { medicamentos: [], error };
     }
+}
+//cargar receta de cita
+static async obtenerRecetaporId(id_cita){
+     try{
+           const{data, error} = await RecetaService.obtenerRecetaporId(id_cita)
+           if(error){
+            return{receta:null, error}
+           }
+           return{receta:data, error:null}
+        }
+        catch(error){
+            return{receta:null, error}
+        }
 }
 }
     

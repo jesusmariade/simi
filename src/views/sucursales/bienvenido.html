@@ -11,25 +11,33 @@
     <!--header-->
     <div id="header-container"></div>
     <!--fin de header-->
+    <div class="bienvenida">
     <main class="sucursal-bienvenida">
     <div class="sucursal-welcome">
     <!--asi alo-->
-<h1 id="titulo-sucursal">Bienvenido a la sucursal [id_sucursal]</h1> </div>
-    <div class="bienvenida-instructions">
+<h1 id="titulo-sucursal">Bienvenido a la sucursal [id_sucursal]</h1><br><br>
         <h2>¿Quien nos acompaña el día de hoy?</h2>
         <p>Por favor seleccione a que area pertenece:</p>
     </div>
     
     <div class="botones">
         <!--agregar pantallas a las que debe ir cuando las tengamos vamos a crear una vista para cada uno para farmacia para medico y para recepcionista :D-->
+        <div class="personal-farmacia-boton">
         <button onclick="location.href='../Personal_Farmacia/farmacia.html'">Personal de Farmacia</button>
-        <button onclick="location.href='../Personal_Medico/medico.html'">Medico</button>
-        <button onclick="location.href='../Personal_Recepcion/pacientes.html'">Recepcionista</button></div>
-        <div class="botoncito">
-        <button onclick="location.href='sucursales.html'">Regresar</button>
         </div>
-    
+        <div class="medico-boton">
+        <button onclick="location.href='../Personal_Medico/medico.html'">Medico</button>
+        </div>
+        <div class="recepcionista-boton">
+        <button onclick="location.href='../Personal_Recepcion/pacientes.html'">Recepcionista</button></div>
+        </div>
+    </div>
+        <div class="botoncito">
+        <button class="bienvenida-regreso" onclick="location.href='sucursales.html'">Regresar</button>
+        </div>
+
 </main>
+</div>
     <!--footer-->
     <div id="footer-container"></div>
     <!--scripts-->
@@ -58,6 +66,12 @@
             titulo.textContent = `Bienvenido a la sucursal ${sucursalNombre}`;
         }
     });
+    const numeroSucursal = localStorage.getItem("sucursalId"); // o "numero_sucursal"
+    if (numeroSucursal) {
+    localStorage.setItem("numero_sucursal", numeroSucursal);
+    }
+
+
 </script>
 </body>
 </html>

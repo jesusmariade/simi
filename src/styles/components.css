@@ -14,6 +14,34 @@ GRACIAS
     box-sizing: border-box;
 }
 
+@keyframes subirBurbujas {
+    0% { transform: translateY(20px); }
+    100% { transform: translateY(-40px); }
+}
+
+@keyframes auroraMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes cornerMove {
+    to { background-position: 400% 0; }
+}
+
+@keyframes letterDraw {
+    0% {
+        opacity: 0;
+        filter: blur(6px);
+        letter-spacing: 4px;
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        letter-spacing: 0;
+    }
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #E1ECD6;
@@ -343,7 +371,10 @@ body {
 }
 
 .sucursales-header {
-    background: #AEE1D3;
+    background: linear-gradient(120deg, #7CD7CF, #50aeb3, #12e0e7, rgb(156, 223, 223));
+    background-size: 300% 300%;
+    animation: auroraMove 10s ease infinite alternate;
+    filter: blur(0.5px);
     padding: 40px 20px;
     text-align: center;
     width: 100%;
@@ -352,8 +383,19 @@ body {
 .sucursales-header h1 {
     font-size: 3em;
     font-weight: 700;
-    color: #16C1C8;
+    color: #fff;
     margin: 0;
+    opacity: 0;
+    animation: letterDraw 1s ease forwards;
+}
+
+.sucursales-header p {
+    font-size: 2em;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    opacity: 0;
+    animation: letterDraw 1.2s ease forwards;
 }
 
 .sucursales-instruction {
@@ -379,9 +421,14 @@ body {
     gap: 30px;
     justify-content: center;
 }
-
+.sucursales-aparicion {
+    animation: fadeIn 0.75s ease-in-out;
+}
 .sucursal-card {
-    background: #7CD7CF;
+    background: linear-gradient(120deg, #7CD7CF, #50aeb3, #12e0e7, rgb(156, 223, 223));
+    background-size: 300% 300%;
+    animation: auroraMove 10s ease infinite alternate;
+    filter: blur(0.5px);
     padding: 30px 40px;
     border-radius: 12px;
     min-width: 250px;
@@ -391,12 +438,12 @@ body {
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(22, 193, 200, 0.2);
 }
-
 .sucursal-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
-    background: #49CCCC;
 }
+
+
 
 .sucursal-card p {
     margin: 8px 0;
@@ -442,17 +489,23 @@ body {
     }
 }
 /*Estilos bienvenida sucursales*/
-
-    .sucursal-welcome{
+    .sucursal-welcome {
         padding: 40px 20px;
-        background: #49CCCC;
         text-align: center;
         color: #ffffff;
+        background: linear-gradient(120deg, #7CD7CF, #1ca8af, #16C1C8, rgb(87, 161, 161));
+        background-size: 300% 300%;
+        animation: auroraMove 10s ease infinite alternate;
+        filter: blur(0.5px);
     }
-    .bienvenida-instructions{
-        text-align: center;
-        color: #ffffff;
-        background: #16C1C8;
+    .sucursal-welcome h1 {
+        animation: letterDraw 0.8s ease forwards;
+    }
+    .sucursal-welcome h2 {
+        animation: letterDraw 1s ease forwards;
+    }
+    .sucursal-welcome p {
+        animation: letterDraw 1.2s ease forwards;
     }
     .botones {
         display: flex;
@@ -462,6 +515,24 @@ body {
         justify-content: center;
         margin-top: 30px;
     }
+    .personal-farmacia-boton {
+        animation: fadeIn 0.6s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+    }
+    .medico-boton {
+        animation: fadeIn 0.8s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+    }
+    .recepcionista-boton {
+        animation: fadeIn 1s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+    }
     .botoncito {
         display: flex;
         flex-direction: row;
@@ -469,24 +540,31 @@ body {
         align-items: center;
         justify-content: center;
         margin-top: 20px;
+        animation: fadeIn 1.2s ease-in-out;
     }
     .botoncito button{
-      margin: 10px;
-        font-size: 18px; 
+        margin: 10px;
+        font-size: 18px;
         font-weight: 600;
-        background: #16C1C8;
+        background: linear-gradient(120deg, #7CD7CF, #1ca8af, #16C1C8, rgb(87, 161, 161));
+        background-size: 300% 300%;
+        animation: auroraMove 10s ease infinite alternate;
+        filter: blur(0.5px);
         color:  #ffffff;
         text-align: center;
         padding: 20px;
         border-radius: 12px;
         border: none;
-        cursor: pointer;  
+        cursor: pointer;
     }
     .botones button{
         margin: 10px;
-        font-size: 18px; 
+        font-size: 18px;
         font-weight: 600;
-        background: #16C1C8;
+        background: linear-gradient(120deg, #7CD7CF, #1ca8af, #16C1C8, rgb(87, 161, 161));
+        background-size: 300% 300%;
+        animation: auroraMove 10s ease infinite alternate;
+        filter: blur(0.5px);
         color:  #ffffff;
         text-align: center;
         padding: 20px;
@@ -497,14 +575,12 @@ body {
     .botones button:hover {
         transform: translateY(-5px);
         transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
-        background: #49CCCC;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.75);
     }
     .botoncito button:hover {
         transform: translateY(-5px);
         transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
-        background: #49CCCC;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.75);
     }
 /*Estilos personal farmacia*/
 
@@ -789,6 +865,14 @@ body {
 /*
    BOTONES
   */
+.farma-botones {
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
 .btn {
     padding: 10px 16px;
     border-radius: var(--radius);
@@ -874,11 +958,20 @@ body {
 }
 
 /*Estilos personal medico*/
-    .medico-bienvenida{
+.medico-bienvenida {
         padding: 40px 20px;
-        background: #49CCCC;
         text-align: center;
         color: #ffffff;
+        background: linear-gradient(120deg, #7CD7CF, #1ca8af, #16C1C8, rgb(87, 161, 161));
+        background-size: 300% 300%;
+        animation: auroraMove 10s ease infinite alternate;
+        filter: blur(0.5px);
+    }
+    .medico-bienvenida h1 {
+        animation: letterDraw 0.8s ease forwards;
+    }
+    .medico-bienvenida p {
+        animation: letterDraw 1s ease forwards;
     }
     .botonregreso {
         margin: 10px;
@@ -952,6 +1045,8 @@ body {
     }
     .citas-medico:hover{
         background: #12413d;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     .editar-medico{
         background: #d1c372;
@@ -962,6 +1057,8 @@ body {
     }
     .editar-medico:hover{
         background: #dadd17;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     .eliminar-medico{
         background: #330505;
@@ -972,6 +1069,8 @@ body {
     }
       .eliminar-medico:hover{
         background: #dd1717;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     /* AGREGAR DOCTOR NO EL SIMI EL OTRO JEJEJE */
     .agregar-medico{
@@ -1058,7 +1157,7 @@ body {
         color: #16C1C8;
     }
     .nombre-medico input, .curp-medico input, .especialidad-medico input, .telefono-medico input, .edad-medico input, .direccion-medico input, .codigo-medico input {
-        width: 600px;
+        width: 500px;
         padding: 10px 14px;
         border: 1px solid #cfcfcf;
         border-radius: 10px;
@@ -1117,7 +1216,7 @@ body {
         color: #16C1C8;
     }
     .edit-nombre-medico input, .edit-curp-medico input, .edit-especialidad-medico input, .edit-telefono-medico input, .edit-edad-medico input, .edit-direccion-medico input, .edit-codigo-medico input {
-        width: 600px;
+        width: 500px;
         padding: 10px 14px;
         border: 1px solid #cfcfcf;
         border-radius: 10px;
@@ -1144,7 +1243,7 @@ body {
         margin-top: -70px;
         padding-right: 0px; /* Ajusta si quieres que estén más pegados o separados del borde */
     }
-    .licencia-botones button {
+    .licencia button {
         margin: 10px;
         font-size: 12px; 
         font-weight: 600;
@@ -1156,7 +1255,7 @@ body {
         cursor: pointer;
         transition: 0.3s;
     }
-    .licencia-botones button:hover {
+    .licencia button:hover {
         transform: translateY(-5px);
         transition: all 0.3s ease;
         box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
@@ -1303,6 +1402,8 @@ body {
     }
     .seleccionar-paciente:hover{
         background: #12413d;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     /* LICENCIAS DE MEDICOS */
     .licencia-medico {
@@ -1327,7 +1428,7 @@ body {
         color: #16C1C8;
     }
     .inicio-licencia input, .fin-licencia input, .duracion-licencia input {
-        width: 600px;
+        width: 500px;
         padding: 10px 14px;
         border: 1px solid #cfcfcf;
         border-radius: 10px;
@@ -1384,6 +1485,18 @@ body {
     .seleccionar-paciente:hover{
         background: #12413d;
     }
+    .actualizar-estado{
+        background: #248a3a;
+        color: #ffffff;
+        padding: 5px;
+        border-radius: 8px;
+        margin: 5px;
+    }
+    .actualizar-estado:hover{
+        background: #024405;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
     .editar-paciente{
         background: #d1c372;
         color: #ffffff;
@@ -1393,6 +1506,8 @@ body {
     }
     .editar-paciente:hover{
         background: #dadd17;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     .eliminar-paciente{
         background: #330505;
@@ -1403,6 +1518,8 @@ body {
     }
     .eliminar-paciente:hover{
         background: #dd1717;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
     }
     /* AGREGAR PACIENTES */
     .agregar-paciente-general {
@@ -1424,7 +1541,7 @@ body {
         color: #16C1C8;
     }
     .curp-paciente input, .ine-paciente input, .nombre-paciente input, .direccion-paciente input, .edad-paciente input, .peso-paciente input, .estatura-paciente input, .descripcion-paciente input {
-        width: 600px;
+        width: 500px;
         padding: 10px 14px;
         border: 1px solid #cfcfcf;
         border-radius: 10px;
@@ -1449,7 +1566,7 @@ body {
         color: #16C1C8;
     }
     .edit-curp-paciente input, .edit-ine-paciente input, .edit-nombre-paciente input, .edit-direccion-paciente input, .edit-edad-paciente input, .edit-peso-paciente input, .edit-estatura-paciente input, .edit-descripcion-paciente input {
-        width: 600px;
+        width: 500px;
         padding: 10px 14px;
         border: 1px solid #cfcfcf;
         border-radius: 10px;
@@ -1538,7 +1655,9 @@ select:focus {
 
 /* BOTONES */
 
-
+.farmacia-botones {
+    text-align: center;
+}
 .btn.primary {
     background: var(--turquesa);
     color: var(--blanco);
@@ -1570,7 +1689,7 @@ select:focus {
         width: 100%;
     }
 }
-/*estilos de cita-paciente*/
+/* ESTILOS DE CITA-PACIENTE */
 .encabezado-paginapaciente{
     align-items: center;
     text-align: center;
@@ -1578,6 +1697,24 @@ select:focus {
     color: #ffffff;
     padding: 18px 25px;
 }
+    .boton-añadir {
+        margin: 10px;
+        font-size: 18px; 
+        font-weight: 600;
+        background: #16C1C8;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .boton-añadir:hover{
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+        background: #49CCCC;
+    }
 .contenido-paciente {
     margin-top: 25px;
     background: var(--blanco);
@@ -1585,3 +1722,401 @@ select:focus {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
+    .citas-del-paciente {
+        text-align: center;
+        width: 80%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+        
+    }
+    .citas-del-paciente button {
+        margin: 10px;
+        font-size: 12px; 
+        font-weight: 600;
+        background: #16C1C8;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .citas-del-paciente button:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+        background: #49CCCC;
+    }
+    .citas-del-paciente table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .citas-del-paciente th,
+    .citas-del-paciente td{
+        border: 1px solid #ffffff;
+        padding: 5px;
+        text-align: center;
+    }
+    .citas-del-paciente td button {
+        margin: 5px;
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+    .citas-del-paciente h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+        color: #0fa4a6;
+    }
+    .citas-del-paciente thead th{
+        background: #16C1C8;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .citas-del-paciente tbody td{
+        background: #e8ffff;
+        padding: 10px;
+        border-radius: 6px;
+        color: #16C1C8;
+    }
+    .citas-del-paciente:hover{
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+    }
+    /* CITAS ELIMINADAS */
+    .citas-del-paciente-canceladas {
+        text-align: center;
+        width: 80%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+        
+    }
+    .citas-del-paciente-canceladas button {
+        margin: 10px;
+        font-size: 12px; 
+        font-weight: 600;
+        background: #16C1C8;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .citas-del-paciente-canceladas button:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+        background: #49CCCC;
+    }
+    .citas-del-paciente-canceladas table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .citas-del-paciente-canceladas th,
+    .citas-del-paciente-canceladas td{
+        border: 1px solid #ffffff;
+        padding: 5px;
+        text-align: center;
+    }
+    .citas-del-paciente-canceladas td button {
+        margin: 5px;
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+    .citas-del-paciente-canceladas h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+        color: #0fa4a6;
+    }
+    .citas-del-paciente-canceladas thead th{
+        background: #16C1C8;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .citas-del-paciente-canceladas tbody td{
+        background: #e8ffff;
+        padding: 10px;
+        border-radius: 6px;
+        color: #16C1C8;
+    }
+    .citas-del-paciente-canceladas:hover{
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+    }
+    /* CITAS COMPLETADAS */
+    .citas-del-paciente-completadas {
+        text-align: center;
+        width: 80%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+        
+    }
+    .citas-del-paciente-completadas button {
+        margin: 10px;
+        font-size: 12px; 
+        font-weight: 600;
+        background: #16C1C8;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .citas-del-paciente-completadas button:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+        background: #49CCCC;
+    }
+    .citas-del-paciente-completadas table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .citas-del-paciente-completadas th,
+    .citas-del-paciente-completadas td{
+        border: 1px solid #ffffff;
+        padding: 5px;
+        text-align: center;
+    }
+    .citas-del-paciente-completadas td button {
+        margin: 5px;
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+    .citas-del-paciente-completadas h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+        color: #0fa4a6;
+    }
+    .citas-del-paciente-completadas thead th{
+        background: #16C1C8;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .citas-del-paciente-completadas tbody td{
+        background: #e8ffff;
+        padding: 10px;
+        border-radius: 6px;
+        color: #16C1C8;
+    }
+    .citas-del-paciente-completadas:hover{
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+    }
+    /* PAGINA AGREGAR CITA ESTILOS */
+    .encabezado-citas-agregar{
+        background: #49CCCC;
+        color: #ffffff;
+        text-align: center;
+    }
+    .agregar-medico-general {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+    }
+    .curp-cita, .medico-cita, .fecha-cita, .horario-cita, .turno-cita {
+        margin-bottom: 18px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .curp-cita label, .medico-cita label, .fecha-cita label, .horario-cita label, .turno-cita label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #16C1C8;
+    }
+    .curp-cita input, .medico-cita input, .fecha-cita input, .horario-cita input, .turno-cita input {
+        width: 500px;
+        padding: 10px 14px;
+        border: 1px solid #cfcfcf;
+        border-radius: 10px;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .curp-cita input, .medico-cita input, .fecha-cita input, .horario-cita input, .turno-cita input {
+        border-color: #16C1C8;
+        box-shadow: 0 0 8px rgba(22, 193, 200, 0.3);
+        outline: none;
+    }
+    /*pagina receta*/
+    .encabezado-recetas{
+        background: #49CCCC;
+        color: #ffffff;
+        text-align: center;
+    }
+    /* ESTILOS RECETA */
+    .tabla-receta {
+        text-align: center;
+        width: 80%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+        
+    }
+    .tabla-receta table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .tabla-receta th,
+    .tabla-receta td{
+        border: 1px solid #ffffff;
+        padding: 5px;
+        text-align: center;
+    }
+    .tabla-receta h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+        color: #0fa4a6;
+    }
+    .tabla-receta thead th{
+        background: #16C1C8;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .tabla-receta tbody td{
+        background: #e8ffff;
+        padding: 10px;
+        border-radius: 6px;
+        color: #16C1C8;
+    }
+    .tabla-receta:hover{
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+    }
+    .tabla-receta-detalles {
+        text-align: center;
+        width: 80%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+        
+    }
+    .tabla-receta-detalles table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    .tabla-receta-detalles th,
+    .tabla-receta-detalles td{
+        border: 1px solid #ffffff;
+        padding: 5px;
+        text-align: center;
+    }
+    .tabla-receta-detalles h2 {
+        margin-bottom: 20px;
+        font-size: 26px;
+        color: #0fa4a6;
+    }
+    .tabla-receta-detalles thead th{
+        background: #16C1C8;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .tabla-receta-detalles tbody td{
+        background: #e8ffff;
+        padding: 10px;
+        border-radius: 6px;
+        color: #16C1C8;
+    }
+    .tabla-receta-detalles:hover{
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.4);
+    }
+    /* EDITAR ESTADO */
+    .encabezado {
+        font-size: 20px;
+        padding: 40px 20px;
+        background: #49CCCC;
+        text-align: center;
+        color: #ffffff;
+    }
+    .parte-para-actualizar {
+        justify-items: center;
+        text-align: center;
+        width: 40%;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 12px rgba(22, 193, 200, 0.75);
+    }
+    .edit-estado-paciente {
+        margin-bottom: 18px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .edit-estado-paciente label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #16C1C8;
+    }
+    .edit-estado-paciente input {
+        width: 500px;
+        padding: 10px 14px;
+        border: 1px solid #cfcfcf;
+        border-radius: 10px;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .edit-estado-paciente input:focus {
+        border-color: #16C1C8;
+        box-shadow: 0 0 8px rgba(22, 193, 200, 0.3);
+        outline: none;
+    }
+    .botoncitos {
+        justify-content: center; /* Centra los botones */
+        margin-top: 20px;
+    }
+    .botoncitos button {
+        margin: 10px;
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(120deg, #7CD7CF, #1ca8af, #16C1C8, rgb(87, 161, 161));
+        background-size: 300% 300%;
+        animation: auroraMove 10s ease infinite alternate;
+        filter: blur(0.5px);
+        color:  #ffffff;
+        text-align: center;
+        padding: 20px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+    }
+    .botoncitos button:hover{
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(22, 193, 200, 0.75);
+    }

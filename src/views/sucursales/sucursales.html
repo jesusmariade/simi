@@ -12,17 +12,15 @@
 
 <main class="sucursales-main">
     <div class="sucursales-header">
-        <h1>Sucursales</h1>
-    </div>
-    
-    <div class="sucursales-instruction">
+        <h1>Sucursales</h1><br>
         <p>Por favor seleccione la sucursal en la que trabaja</p>
     </div>
     
+    <div class="sucursales-aparicion">
     <div class="sucursales-container" id="sucursales-container">
         <!-- Las sucursales se cargarán aquí cuando tenamos suicursales registradas en nuestra base de datos obvio vamos a acregar un evento 
          que suceda cada que se le haga click a alguna sucursal pase a nuestra siguiente vista con los datos de la sucursale que sea elegida entendido? -->
-    </div>
+    </div></div>
 </main>
 
     <!-- Aquí se cargará el footer -->
@@ -51,14 +49,6 @@
     <script type="module">
         import { SucursalController } from '../../controllers/SucursalController.js';
         
-        // Esperar a que el DOM ¿que era el DOM CHICOS? (Document Object Modele) sté listo
-        //El DOM (Document Object Model) es la representación en memoria de tu página HTML.
-        // El navegador crea un árbol de objetos que representa cada elemento (etiquetas, texto, atributos) y permite que JavaScript 
-        // los lea y modifique.
-        //Imagina que el DOM es como un menú de restaurante:
-        //El HTML es la receta (qué ingredientes hay)
-        //El DOM es el menú organizado (qué platos puedes pedir)
-        //JavaScript es el mesero (puede leer el menú y traerte lo que pidas)
 
         document.addEventListener('DOMContentLoaded', () => {
             SucursalController.inicializar();

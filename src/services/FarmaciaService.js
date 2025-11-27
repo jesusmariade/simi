@@ -1,34 +1,79 @@
 // src/services/FarmaciaService.js
 import supabase from '../../supabase/supabaseClient.js';
 
+
 export class FarmaciaService {
     static async obtenerRecetas(idFarmacia = null) {
-    try {
-        let query = supabase
-            .from('receta')
-            .select(`
-                *,
-                cita (
-                    curp_paciente,
-                    paciente:curp_paciente (
-                        nombre_completo
+        try {
+            let query = supabase
+                .from('receta')
+                .select(`
+                    *,
+                    cita (
+                        curp_paciente,
+                        codigo_medico,
+                        medico:codigo_medico (
+                            numero_sucursal
+                        ),
+                        paciente:curp_paciente (
+                            nombre_completo
+                        )
                     )
-                )
-            `)
-            .order('fecha_expedicion', { ascending: false });
+                `)
+                .order('fecha_expedicion', { ascending: false });
+            
+            //Si hay idFarmacia, obtener la sucursal y filtrar
+          //Si hay idFarmacia, obtener la sucursal y filtrar
+if (idFarmacia) {
+    // Obtener la sucursal de la farmacia
+    const { data: farmacia } = await supabase
+        .from('farmacia')
+        .select('n_sucursal')
+        .eq('id_farmacia', parseInt(idFarmacia))
+        .single();
+    
+    if (farmacia) {
+        // Obtener los códigos de médicos de esta sucursal
+        const { data: medicos } = await supabase
+            .from('medico')
+            .select('codigo')
+            .eq('numero_sucursal', farmacia.n_sucursal);
         
-        // obtenemos todas las recetas
-        const { data, error } = await query;
-        
-        if (error) {
-            return { data: null, error };
+        if (medicos && medicos.length > 0) {
+            const codigosMedicos = medicos.map(m => m.codigo);
+            
+            // Obtener las citas de esos médicos
+            const { data: citas } = await supabase
+                .from('cita')
+                .select('id_cita')
+                .in('codigo_medico', codigosMedicos);
+            
+            if (citas && citas.length > 0) {
+                const idsCitas = citas.map(c => c.id_cita);
+                // Filtrar recetas por esas citas
+                query = query.in('id_cita', idsCitas);
+            } else {
+                // Si no hay citas, retornar array vacío
+                return { data: [], error: null };
+            }
+        } else {
+            // Si no hay médicos en esta sucursal, retornar array vacío
+            return { data: [], error: null };
         }
-        
-        return { data, error: null };
-    } catch (error) {
-        return { data: null, error };
     }
 }
+            
+            const { data, error } = await query;
+            
+            if (error) {
+                return { data: null, error };
+            }
+            
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    }
 
 static async surtirReceta(idReceta) {
     try {
@@ -87,13 +132,20 @@ static async surtirReceta(idReceta) {
     static async obtenerVentas(idFarmacia = null) {
         try {
             let query = supabase
-                .from('venta')
-                .select('*')
-                .order('fecha_venta', { ascending: false });
+            .from('venta')
+            .select(`
+                *,
+                medicamento (
+                    id_medicamento,
+                    nombre,
+                    precio
+                )
+            `)
+            .order('fecha_venta', { ascending: false });
             
-            if (idFarmacia) {
-                query = query.eq('id_farmacia', idFarmacia);
-            }
+                if (idFarmacia) {
+                    query = query.eq('id_farmacia', parseInt(idFarmacia));
+                }
             
             const { data, error } = await query;
             
@@ -111,13 +163,16 @@ static async surtirReceta(idReceta) {
         try {
             const { data, error } = await supabase
                 .from('venta')
-                .insert({
-                    id_farmacia: ventaData.id_farmacia,
-                    id_medicamento: ventaData.id_medicamento || null,
-                    fecha_venta: ventaData.fecha_venta || new Date().toISOString().split('T')[0],
-                    total: ventaData.total,
-                    tipo: ventaData.tipo || 'venta'
-                })
+                
+.insert({
+    id_farmacia: ventaData.id_farmacia,
+    id_medicamento: ventaData.id_medicamento || null, // Permitir NULL
+    fecha_venta: ventaData.fecha_venta || new Date().toISOString().split('T')[0],
+    hora_venta: ventaData.hora_venta || new Date().toTimeString().split(' ')[0],
+    total: ventaData.total,
+    tipo: ventaData.tipo || 'venta',
+    vendedor: ventaData.vendedor || null
+})
                 .select()
                 .single();
             
@@ -173,7 +228,6 @@ static async surtirReceta(idReceta) {
 
 static async obtenerMedicamentosdeRecetas(idReceta){
 	//metodo para obtener medicamentos asociados a una receta
-	//por implementar no me acuerdo si tenia dosis 
 	try{
 		const {data,error} = await supabase
 		.from('receta_medicamento')

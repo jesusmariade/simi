@@ -81,6 +81,7 @@
                         <td>${paciente.descripcion_deestado}</td>
                         <td>
                             <button class="seleccionar-paciente" data-curp="${paciente.curp}" data-nombre_completo="${paciente.nombre_completo}">Seleccionar Paciente</button>
+                            <button class="actualizar-estado" data-curp="${paciente.curp}" data-nombre_completo="${paciente.nombre_completo}">Actualizar Estado</button>
                             <button class="editar-paciente" data-curp="${paciente.curp}" data-nombre_completo="${paciente.nombre_completo}">Editar Paciente</button>
                             <button class="eliminar-paciente" data-curp="${paciente.curp}">Eliminar Paciente</button>
                         </td>
@@ -91,6 +92,14 @@
                     activarBotones();
                 }
                 async function activarBotones() {
+                    //boton para actualizar estado
+                    document.querySelectorAll(".actualizar-estado").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        localStorage.setItem("curp",btn.dataset.curp);
+                        localStorage.setItem("nombre_completo",btn.dataset.nombre_completo);
+                        location.href = "actualizar-estado.html";
+                    });
+                });
                     //boton para ir a ver citas del paciente
                     document.querySelectorAll(".seleccionar-paciente").forEach(btn => {
                     btn.addEventListener("click", () => {

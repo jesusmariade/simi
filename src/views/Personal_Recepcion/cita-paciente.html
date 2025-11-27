@@ -13,8 +13,9 @@
     <main>
         <div class="encabezado-paginapaciente">
             <h1 id="paciente-nombre">Atendiendo al Paciente: [nombre_completo]</h1>
-            <p>Aqui se pueden agendar,eliminar y editar las citas del paciente</p>
+            <p>Aqui se pueden agendar,eliminar y editar las citas del paciente<br>Recordar que solo apareceran las citas agendadas en esta sucursal</p>
              <button class="botonregreso" onclick="location.href='pacientes.html'">Regresar</button>
+             <button class="boton-añadir" id="btn-agregar-cita">Agregar Cita</button><!--va a cambiar mucho este es solo un boton provisional--><!--no c-->
         </div>
         <div class="contenido-paciente">
         <div class="citas-del-paciente">
@@ -24,7 +25,7 @@
                         <tr>
                             <th>ID Cita</th>
                             <th>CURP Paciente</th>
-                            <th>Codigo Medico</th>
+                            <th>Codigo Medico-tal vez nombre medico</th>
                             <th>Fecha</th>
                             <th>Horario</th>
                             <th>Turno</th>
@@ -36,15 +37,46 @@
                         <tr>
                             <td>[id_cita]</td>
                             <td>[curp_paciente]</td>
-                            <td>[codigo_medico]</td>
+                            <td>[codigo_medico o nombre-medico]</td>
                             <td>[fecha]</td>
                             <td>[horario]</td>
                             <td>[turno]</td>
                             <td>[cancelada]</td>
                             <td>
-                                <button onclick="location.href=''">editar cita</button>
+                                <button onclick="location.href='citas/editarcita.html'">editar cita</button>
                                 <button onclick="location.href=''">eliminar cita</button>
                                 <button onclick="location.href=''">cancelar cita</button>        
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div class="citas-del-paciente-completadas">
+            <h2>Citas Completadas</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Cita</th>
+                            <th>CURP Paciente</th>
+                            <th>Codigo Medico-tal vez nombre medico</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Turno</th>
+                            <th>Cancelada?</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>[id_cita]</td>
+                            <td>[curp_paciente]</td>
+                            <td>[codigo_medico o nombre-medico]</td>
+                            <td>[fecha]</td>
+                            <td>[horario]</td>
+                            <td>[turno]</td>
+                            <td>[si o no]</td>
+                            <td>
+                                <button class="receta-btn" data-id="${c.id_cita}">Ver Receta</button>        
                             </td>
                         </tr>
                     </tbody>
@@ -57,7 +89,7 @@
                         <tr>
                             <th>ID Cita</th>
                             <th>CURP Paciente</th>
-                            <th>Codigo Medico</th>
+                            <th>Codigo Medico o nombre-medico</th>
                             <th>Fecha</th>
                             <th>Horario</th>
                             <th>Turno</th>
@@ -69,7 +101,7 @@
                         <tr>
                             <td>[id_cita]</td>
                             <td>[curp_paciente]</td>
-                            <td>[codigo_medico]</td>
+                            <td>[codigo_medico o nombre-medico]</td>
                             <td>[fecha]</td>
                             <td>[horario]</td>
                             <td>[turno]</td>
@@ -86,24 +118,180 @@
     <!--footer-->
     <div id="footer-container"></div>
     <script type="module">
-        window.addEventListener('DOMContentLoaded', () => {
-        const nombre_completo = localStorage.getItem('nombre_completo');
-        const titulo = document.getElementById('paciente-nombre');
-        if (titulo) {
-            titulo.textContent = `Atendiendo al Paciente: ${nombre_completo}`;
+        import { CitaController } from "../../controllers/CitaController.js";
+
+window.addEventListener('DOMContentLoaded', () => {
+    const nombre_completo = localStorage.getItem('nombre_completo');
+    const titulo = document.getElementById('paciente-nombre');
+    if (titulo) {
+        titulo.textContent = `Atendiendo al Paciente: ${nombre_completo}`;
+    }
+});
+
+//cargar citas
+document.addEventListener("DOMContentLoaded", cargarCitas);
+
+async function cargarCitas() {
+    const curp = localStorage.getItem("curp");
+    const sucursal = localStorage.getItem("numero_sucursal"); // lo que envió la vista
+
+    
+
+    if(!curp){
+        console.error("No hay curp");
+        return;
+    }
+    
+    // Cargar citas filtradas por sucursal (parámetro true por defecto)
+    const {cita, error} = await CitaController.CargarCitasporpaciente(curp, sucursal);
+    
+    if(error){
+        console.error("Error:", error);
+        return;
+    }
+    renderizarCita(cita);
+    console.log("sucursal actual:",sucursal)
+    console.log(Object.keys(localStorage));
+
+
+
+}
+
+//mostrar las citas
+async function renderizarCita(cita){
+    const hoy = new Date().toISOString().split("T")[0];
+    
+    const tbodyA = document.querySelector(".citas-del-paciente tbody");
+    const tbodyC = document.querySelector(".citas-del-paciente-completadas tbody");
+    const tbodyX = document.querySelector(".citas-del-paciente-canceladas tbody");
+
+    tbodyA.innerHTML = "";
+    tbodyC.innerHTML = "";
+    tbodyX.innerHTML = "";
+
+    if(!cita || cita.length === 0){
+        tbodyA.innerHTML = `<tr><td colspan="8">No hay citas registradas en esta sucursal.</td></tr>`;
+        return;
+    }
+
+    cita.forEach(c => {
+        const tr = document.createElement("tr");
+        
+        // Obtener nombre del médico (ya viene del JOIN)
+        const nombreMedico = c.medico ? c.medico.nombre_completo : `Código: ${c.codigo_medico}`;
+
+        tr.innerHTML = `
+        <td>${c.id_cita}</td>
+        <td>${c.curp_paciente}</td>
+        <td>${nombreMedico}(${c.codigo_medico})</td>
+        <td>${c.fecha}</td>
+        <td>${c.horario}</td>
+        <td>${c.turno}</td>
+        <td>${c.cancelada ? "Sí" : "No"}</td>
+        <td class="acciones"></td>
+        `;
+
+        const acciones = tr.querySelector(".acciones");
+
+        //cancelada
+        if(c.cancelada) {
+            acciones.innerHTML = `<button class="reactivar-btn" data-id="${c.id_cita}">Reactivar</button>`;
+            tbodyX.appendChild(tr);
+            return;
         }
+
+        //completada
+        if (c.fecha < hoy) {
+            acciones.innerHTML = `<button class="receta-btn" data-id="${c.id_cita}" onclick="location.href='receta.html'">Ver Receta</button>`;
+            tbodyC.appendChild(tr);
+            return;
+        }
+
+        // AGENDADA
+        acciones.innerHTML = `
+            <button class="editar-btn" data-id="${c.id_cita}">Editar</button>
+            <button class="eliminar-btn" data-id="${c.id_cita}">Eliminar</button>
+            <button class="cancelar-btn" data-id="${c.id_cita}">Cancelar</button>
+        `;
+        tbodyA.appendChild(tr);
     });
+    activarBotones();
+}
+
+//para mis botoncitos
+async function activarBotones(){
+    //editar
+    // EDITAR
+    document.querySelectorAll(".editar-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            localStorage.setItem("id_cita", btn.dataset.id);
+            location.href = "citas/editarcita.html";
+        });
+    });
+
+    // ELIMINAR
+    document.querySelectorAll(".eliminar-btn").forEach(b => {
+        b.addEventListener("click", async () => {
+            if (!confirm("¿Eliminar cita?")) return;
+            const { success } = await CitaController.eliminarCita(b.dataset.id);
+            if (success) location.reload();
+        });
+    });
+
+    // CANCELAR
+    document.querySelectorAll(".cancelar-btn").forEach(b => {
+        b.addEventListener("click", async () => {
+            if (!confirm("¿Cancelar cita?")) return;
+            await CitaController.cancelarCita(b.dataset.id);
+            location.reload();
+        });
+    });
+
+    // REACTIVAR
+    document.querySelectorAll(".reactivar-btn").forEach(b => {
+        b.addEventListener("click", async () => {
+            await CitaController.reactivarCita(b.dataset.id);
+            location.reload();
+        });
+    });
+    
+    // VER RECETA
+    document.querySelectorAll(".receta-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            localStorage.setItem("id_cita", btn.dataset.id);
+            location.href = "receta.html";
+        });
+    });
+}
+
+//para que funcione el boton agregar citas
+document.getElementById("btn-agregar-cita").addEventListener("click", () => {
+    const curp = localStorage.getItem("curp");
+    const nombre_completo = localStorage.getItem("nombre_completo");
+
+    if (!curp || !nombre_completo) {
+        alert("Error: No se encontró la CURP del paciente o el nombre del paciente.");
+        return;
+    }
+
+    // Guardar datos para agregarcita.html
+    localStorage.setItem("curp", curp);
+    localStorage.setItem("nombre_completo", nombre_completo);
+
+    // Redirigir
+    location.href = "/src/views/Personal_Recepcion/citas/agregarcita.html";
+});
     </script>
     <script>
         //cargar header
-        fetch('/../../../header.html')
+        fetch('../../../header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('/../../../footer.html')
+        fetch('../../../footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
