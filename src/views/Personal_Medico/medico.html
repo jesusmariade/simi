@@ -18,6 +18,7 @@
             <button class="botonregreso" onclick="location.href='../sucursales/bienvenido.html'">Regresar</button>
             <!--revisar boton de agregar-->
             <button class="botonagregar" onclick="location.href='agregarmedico.html'">Agregar medico</button>
+            <button id="btn-cerrar-sesion" class="botonregreso" aria-label="Cerrar sesión">Cerrar Sesión</button>
             </div>
             </div>
         <br>
@@ -66,6 +67,11 @@
             //dios bendiceme con el script para que funcione
             //importar controlador
             import { MedicoController} from '../../controllers/MedicoController.js';
+            import { AuthController } from '../../controllers/AuthController.js';
+
+            if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('medico')) {
+                window.location.href = '../Login/login.html';
+            }
             //cargar medicos
             document.addEventListener("DOMContentLoaded",cargarMedicos);
             //funcion para cargarlos
@@ -108,7 +114,7 @@
                      <td>${medico.especialidad}</td>
                      <td>${medico.numero_sucursal}</td>
                      <td>
-                        <button class="citas-medico" data-codigo="${medico.codigo}" data-nombre_completo="${medico.nombre_completo}">ver citas</button>
+                        <button class="citas-medico" data-codigo="${medico.codigo}" data-nombre_completo="${medico.nombre_completo}">Ver citas</button>
                         <button class="editar-medico" data-codigo="${medico.codigo}">Editar medico</button>
                         <button class="eliminar-medico" data-codigo="${medico.codigo}">Eliminar Medico</button>
                     </td>
@@ -161,6 +167,13 @@
             titulo.textContent = `Área de Personal Médico ${sucursalNombre}`;
             }
             });
+
+            const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+            if (btnCerrarSesion) {
+                btnCerrarSesion.addEventListener('click', () => {
+                    AuthController.cerrarSesion();
+                });
+            }
         </script>
     </body>
 </html>

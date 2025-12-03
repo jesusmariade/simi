@@ -13,9 +13,7 @@
     <main>
         <div class="bienvenida-medico"><br>
             <h2 id="nombre-doctor">Bienvenido Doctor [nombre_completo]</h2>
-            <div class="boton-medico">
-                <button onclick="location.href='medico.html'">Regresar</button>
-            </div>
+                <button class="boton-medico" onclick="location.href='medico.html'">Regresar</button>
         </div>
 
         <br>
@@ -43,7 +41,7 @@
             <br>
 
             <!-- Citas Pasadas -->
-            <div class="citas-del-medico">
+            <div class="citas-pasadas">
                 <h2>Citas Pasadas</h2>
                 <table id="tabla-citas-pasadas">
                     <thead>
@@ -66,9 +64,7 @@
             <!-- Licencias -->
             <div class="licencia">
                 <h2>Licencias Tomadas</h2>
-                <div class="boton-licencia">
-                    <button onclick="guardarYEnviarLicencia()">Solicitar licencia</button>
-                </div>
+                    <button class="boton-licencia" onclick="guardarYEnviarLicencia()">Solicitar licencia</button>
 
                 <table id="tabla-licencias">
                     <thead>
@@ -112,9 +108,13 @@
             const { cita, error } = await CitaController.CargarCitaspormedico(codigo);
             if (error) return console.error(error);
 
-            renderizarCitas(cita);
-            activarBotonesReceta(cita);
+            // Filtrar las canceladas
+            const citasFiltradas = cita.filter(c => c.cancelada === false);
+
+            renderizarCitas(citasFiltradas);
+            activarBotonesReceta(citasFiltradas);
         }
+
 
         function renderizarCitas(citas) {
             const hoy = new Date().toISOString().split("T")[0];
@@ -148,7 +148,7 @@
                     tbodyPasadas.appendChild(tr);
                 } else {
                     acciones.innerHTML = `
-                        <button class="ver-estado-btn" data-id="${cita.id_cita}" data-curp="${cita.curp_paciente}">ver estado</button>`;
+                        <button class="ver-estado-btn" data-id="${cita.id_cita}" data-curp="${cita.curp_paciente}">Ver estado</button>`;
                     tbodyFuturas.appendChild(tr);
                 }
             });

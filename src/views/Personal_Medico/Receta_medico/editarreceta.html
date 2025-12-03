@@ -48,19 +48,21 @@
                 
                 <div style="margin-top: 20px;">
                     <button type="submit" class="btn primary">Guardar Receta</button>
-                    <button type="button" onclick="location.href='../citas-medico.html'" class="btn">Cancelar</button>
+                    <button type="button" onclick="location.href='verreceta.html'" class="btn">Cancelar</button>
                 </div>
             </form>
         </div>
     </main>
     
     <div id="footer-container"></div>
+
 <script type="module">
 import { RecetaController } from '../../../controllers/RecetaController.js';
 
+
 document.addEventListener('DOMContentLoaded', async () => {
 
-    //obtener id
+    // Obtener id de cita desde la URL
     const urlParams = new URLSearchParams(window.location.search);
     const idCita = urlParams.get('id_cita');
 
@@ -72,110 +74,237 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('id-cita').value = idCita;
 
-
-    //cargar lista medicamentos
+    // ==========================================
+    // 1. Cargar medicamentos disponibles
+    // ==========================================
     let listaMedicamentos = [];
+    const { medicamentos, error: errorMed } = await RecetaController.cargarMedicamentos();
 
-    const { medicamentos, error } = await RecetaController.cargarMedicamentos();
-
-    if (error || !medicamentos) {
-        alert("Error cargando medicamentos");
-        console.error(error);
+    if (errorMed || !medicamentos) {
+        alert("Error cargando lista de medicamentos");
+        console.error(errorMed);
         return;
     }
 
     listaMedicamentos = medicamentos;
 
-    cargarSelects();
 
+    // ==========================================
+    // 2. Cargar receta existente (si existe)
+    // ==========================================
+    const { receta, error: errorRec } = await RecetaController.obtenerRecetaporCita(idCita);
 
-    function cargarSelects() {
-        const selects = document.querySelectorAll(".select-medicamento");
-
-        selects.forEach(select => {
-            select.innerHTML = '<option value="">Seleccione un medicamento...</option>';
-
-            listaMedicamentos.forEach(med => {
-                const option = document.createElement("option");
-                option.value = med.id_medicamento;
-                option.textContent = `${med.nombre} - $${med.precio}`;
-                select.appendChild(option);
-            });
-        });
+    if (!errorRec && receta) {
+        console.log("Receta encontrada:", receta);
+        cargarMedicamentosExistentes(receta.receta_medicamento);
     }
 
 
-    //nuevo medicamento
+    // ==========================================
+    // FUNCIONES
+    // ==========================================
+
+    function cargarSelects() {
+    const selects = document.querySelectorAll(".select-medicamento");
+
+    selects.forEach(select => {
+        const valorPrevio = select.value; // <--- GUARDAR SELECCIÓN
+
+        select.innerHTML = '<option value="">Seleccione un medicamento...</option>';
+
+        listaMedicamentos.forEach(med => {
+            const option = document.createElement("option");
+            option.value = med.id_medicamento;
+            option.textContent = `${med.nombre} - $${med.precio}`;
+            select.appendChild(option);
+        });
+
+        // VOLVER A SELECCIONAR EL VALOR ANTERIOR (si existía)
+        if (valorPrevio) {
+            select.value = valorPrevio;
+        }
+    });
+}
+
+    function cargarMedicamentosExistentes(lista) {
+        const container = document.getElementById("medicamentos-container");
+        container.innerHTML = "";
+
+        lista.forEach(item => {
+            const div = document.createElement("div");
+            div.classList.add("medicamento-item");
+            div.dataset.idReceta = item.id_receta;
+div.dataset.idMedicamento = item.id_medicamento;
+
+            div.innerHTML = `
+                <label>Medicamento
+                    <select class="select-medicamento" required>
+                        <option value="">Cargando...</option>
+                    </select>
+                </label>
+
+                <label>Cantidad
+                    <input type="number" class="input-cantidad" min="1" value="${item.cantidad}" required>
+                </label>
+
+                <label>Dosis (opcional)
+                    <input type="text" class="input-dosis" value="${item.dosis || ''}">
+                </label>
+
+                <button type="button" class="btn remove-med">Eliminar</button>
+            `;
+
+            container.appendChild(div);
+        });
+
+        cargarSelects();
+
+        setTimeout(() => {
+            const selects = document.querySelectorAll(".select-medicamento");
+            selects.forEach((sel, i) => {
+                sel.value = lista[i].id_medicamento;
+            });
+        }, 200);
+    }
+
+
+    // ==========================================
+    // 3. Agregar nuevo medicamento
+    // ==========================================
     document.getElementById("add-medicamento").addEventListener("click", () => {
         const container = document.getElementById("medicamentos-container");
 
-        const clone = container.firstElementChild.cloneNode(true);
+        const block = document.createElement("div");
+        block.classList.add("medicamento-item");
 
-        clone.querySelector(".input-cantidad").value = 1;
-        clone.querySelector(".input-dosis").value = "";
+        block.innerHTML = `
+            <label>Medicamento
+                <select class="select-medicamento" required></select>
+            </label>
 
-        container.appendChild(clone);
+            <label>Cantidad
+                <input type="number" class="input-cantidad" value="1" min="1" required>
+            </label>
+
+            <label>Dosis (opcional)
+                <input type="text" class="input-dosis">
+            </label>
+
+            <button type="button" class="btn remove-med">Eliminar</button>
+        `;
+
+        container.appendChild(block);
         cargarSelects();
     });
 
 
-    //para eliminar
+    // ==========================================
+    // 4. Eliminar bloque visual (marca para borrar)
+    // ==========================================
     document.addEventListener("click", (e) => {
         if (e.target.classList.contains("remove-med")) {
-            const items = document.querySelectorAll(".medicamento-item");
 
-            if (items.length > 1) {
-                e.target.parentElement.remove();
+            const div = e.target.closest(".medicamento-item");
+
+            // marcar como eliminado si ya existía
+          if (div.dataset.idMedicamento) {
+                div.classList.add("to-delete");
+                div.style.display = "none"; // ocultarlo sin borrarlo
             } else {
-                alert("Debe haber al menos un medicamento");
+                div.remove(); // solo los que no existen en la BD se pueden borrar directo
             }
+
+
         }
     });
 
 
-    //parte del submit
-    document.getElementById('formReceta').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // ==========================================
+// 5. ENVIAR FORMULARIO (Actualizar Receta)
+// ==========================================
+document.getElementById('formReceta').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const idCita = parseInt(document.getElementById('id-cita').value);
+    const idCita = parseInt(document.getElementById('id-cita').value);
 
-        const { receta, error: errorReceta } = await RecetaController.crearRecetaDesdeCita(idCita);
+    // 1. Buscar receta existente
+    let { receta, error: errBuscar } = await RecetaController.obtenerRecetaporCita(idCita);
 
-        if (errorReceta || !receta) {
-            alert("Error al crear receta");
+    // 2. Si NO existe, crearla
+    if (!receta) {
+        let resultadoCreacion = await RecetaController.crearRecetaDesdeCita(idCita);
+
+        if (resultadoCreacion.error) {
+            alert("Error al obtener/crear receta");
             return;
         }
 
-        const bloques = document.querySelectorAll(".medicamento-item");
+        receta = resultadoCreacion.receta;
+    }
 
-        for (const item of bloques) {
-            const idMedicamento = item.querySelector(".select-medicamento").value;
-            const cantidad = item.querySelector(".input-cantidad").value;
-            const dosis = item.querySelector(".input-dosis").value;
-            const comprado = false;
+    // ===========================
+    // 3. ELIMINAR PRIMERO
+    // ===========================
+    const toDelete = document.querySelectorAll(".to-delete");
 
-            //para ver que envia
-            console.log("ID MED:", idMedicamento, "CANT:", cantidad, "DOSIS:", dosis);
+    for (const node of toDelete) {
+        const idReceta = node.dataset.idReceta;
+        const idMedicamento = node.dataset.idMedicamento;
 
+        if (idReceta && idMedicamento) {
+            await RecetaController.eliminarMedicamentoReceta(idReceta, idMedicamento);
+        }
+    }
+
+    // ===========================
+    // 4. LUEGO AGREGAR/ACTUALIZAR
+    // ===========================
+    const bloques = document.querySelectorAll(".medicamento-item");
+
+    for (const item of bloques) {
+
+        const idRecetaExistente = item.dataset.idReceta;          // existe si viene de la BD
+        const idMedicamentoExistente = item.dataset.idMedicamento; // existe si viene de la BD
+
+        const idMedicamento = item.querySelector(".select-medicamento").value;
+        const cantidad = item.querySelector(".input-cantidad").value;
+        const dosis = item.querySelector(".input-dosis").value;
+
+        if (!idMedicamento) continue; // evitar guardar vacíos
+
+        if (idRecetaExistente && idMedicamentoExistente) {
+            // actualizar
+            await RecetaController.actualizarMedicamentoReceta(
+                idRecetaExistente,
+                idMedicamentoExistente,
+                {
+                    id_medicamento: idMedicamento,
+                    cantidad,
+                    dosis
+                }
+            );
+        } else {
+            // agregar nuevo
             await RecetaController.agregarMedicamentoAReceta(receta.id_receta, {
                 id_medicamento: idMedicamento,
                 cantidad,
                 dosis,
-                comprado
+                comprado: false
             });
         }
+    }
 
-        alert("Receta creada exitosamente");
-        location.href = "../citas-medico.html";
-    });
-
+    alert("Receta actualizada correctamente");
+    location.href = "verreceta.html";
+});
 });
 
-//headder
+// Header
 fetch('../../../../header.html')
     .then(res => res.text())
     .then(data => document.getElementById('header-container').innerHTML = data);
-//footer
+
+// Footer
 fetch('../../../../footer.html')
     .then(res => res.text())
     .then(data => document.getElementById('footer-container').innerHTML = data);

@@ -11,7 +11,7 @@
     <main>
         <div class="encabezado-recetas">
             <h1>Receta</h1>
-            <h2>datos de receta</h2>
+            <h3>Datos de la receta</h3>
             <button class="botonregreso" onclick="location.href='../citas-medico.html'">Regresar</button>
         </div>
             <div class="tabla-receta">
@@ -36,7 +36,7 @@
             </div>
             <div class="tabla-receta-detalles">
                 <div>
-                    <button id="editar" onclick="guardarId()">Editar receta</button>
+                    <button class="receta-edit" id="editar">Editar medicamentos de receta</button>
                 </div>
                <table>
                 <thead>
@@ -144,7 +144,7 @@
            const id_receta = localStorage.getItem("id_receta");
             if(!id_receta){
                 console.error("No hay id cita,que raro",error);
-                return; dio 
+                return;
             }
             const {RecetaMedicamento,error} = await RecetaMedicamentoController.obtenerRecetaMedicamentoporid(id_receta);
 
@@ -181,96 +181,96 @@
         }
     </script>-->
     <script type="module">
-import { RecetaController } from '../../../controllers/RecetaController.js';
-import { RecetaMedicamentoController } from '../../../controllers/RecetaMedicamentoController.js';
+        import { RecetaController } from '../../../controllers/RecetaController.js';
+        import { RecetaMedicamentoController } from '../../../controllers/RecetaMedicamentoController.js';
 
-document.addEventListener("DOMContentLoaded", iniciar);
+        document.addEventListener("DOMContentLoaded", iniciar);
 
-async function iniciar() {
-    await cargarRecetaYMedicamentos();
-}
+        async function iniciar() {
+            const id_cita = localStorage.getItem("id_cita");
 
-async function cargarRecetaYMedicamentos() {
+            if (!id_cita) {
+                console.error("No hay id_cita");
+                return;
+            }
 
-    // 1. Obtener ID de la cita
-    const id_cita = localStorage.getItem("id_cita");
-    if (!id_cita) {
-        console.error("No hay id_cita");
-        return;
-    }
+            // Listener del botón usando la id_cita correcta
+            const btnEditar = document.getElementById('editar');
+            if (btnEditar) {
+                btnEditar.addEventListener('click', () => {
+                location.href = `editarreceta.html?id_cita=${id_cita}`;
+                });
 
-    // 2. Obtener la receta
-    const { receta, error } = await RecetaController.obtenerRecetaporId(id_cita);
+            }
 
-    if (error) {
-        console.error("Error al cargar receta:", error);
-        return;
-    }
+            await cargarRecetaYMedicamentos(id_cita);
+            
 
-    renderizarRecetas(receta);
+        }
 
-    if (!receta || receta.length === 0) {
-        console.warn("La cita no tiene receta todavía.");
-        document.querySelector(".tabla-receta-detalles").style.display = "none";
-        return;
-    }
+        async function cargarRecetaYMedicamentos(id_cita) {
 
-    // 3. Tomar id_receta correcto
-    const id_receta = receta[0].id_receta;
+            const { receta, error } = await RecetaController.obtenerRecetaporId(id_cita);
 
-    // 4. Cargar medicamentos de esa receta
-    const { RecetaMedicamento, error: errorRM } =
-        await RecetaMedicamentoController.obtenerRecetaMedicamentoporid(id_receta);
+            if (error) {
+                console.error("Error al cargar receta:", error);
+                return;
+            }
 
-    if (errorRM) {
-        console.error("Error cargando medicamentos:", errorRM);
-        return;
-    }
+            renderizarRecetas(receta);
 
-    renderizarRecetasMedicamento(RecetaMedicamento);
-}
+            if (!receta || receta.length === 0) {
+                console.warn("La cita no tiene receta todavía.");
+                document.querySelector(".tabla-receta-detalles").style.display = "none";
+                return;
+            }
 
-// 5. Render tabla receta
-function renderizarRecetas(receta) {
-    const tbody = document.querySelector(".tabla-receta tbody");
-    tbody.innerHTML = "";
+            const id_receta = receta[0].id_receta;
 
-    receta.forEach(r => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${r.id_receta}</td>
-                <td>${r.id_cita}</td>
-                <td>${r.fecha_expedicion}</td>
-                <td>${r.surtida}</td>
-            </tr>
-        `;
-    });
-}
+           const { RecetaMedicamento, error: errorRM } =
+                await RecetaMedicamentoController.obtenerRecetaMedicamentoporid(id_receta);
 
-// 6. Render tabla medicamentos
-function renderizarRecetasMedicamento(rmLista) {
-    const tbody = document.querySelector(".tabla-receta-detalles tbody");
-    tbody.innerHTML = "";
+            if (errorRM) {
+                console.error("Error al cargar medicamentos:", errorRM);
+                return;
+            }
 
-    rmLista.forEach(rm => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${rm.id_receta}</td>
-                <td>${rm.medicamento?.nombre}</td>
-                <td>${rm.cantidad}</td>
-                <td>${rm.dosis}</td>
-                <td>${rm.comprado}</td>
-            </tr>
-        `;
-    });
-}
+            renderizarRecetasMedicamento(RecetaMedicamento);
 
-//pa mandar el id de cita
-function guardarId(id_cita) {
-    localStorage.setItem("id_cita", id_cita);
-    location.href = "editarreceta.html";
-}
+        }
 
+        function renderizarRecetas(receta) {
+            const tbody = document.querySelector(".tabla-receta tbody");
+            tbody.innerHTML = "";
+
+            receta.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.id_receta}</td>
+                        <td>${r.id_cita}</td>
+                        <td>${r.fecha_expedicion}</td>
+                        <td>${r.surtida}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderizarRecetasMedicamento(rmLista) {
+            const tbody = document.querySelector(".tabla-receta-detalles tbody");
+            tbody.innerHTML = "";
+
+            rmLista.forEach(rm => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${rm.id_receta}</td>
+                        <td>${rm.medicamento?.nombre}</td>
+                        <td>${rm.cantidad}</td>
+                        <td>${rm.dosis}</td>
+                        <td>${rm.comprado}</td>
+                    </tr>
+                `;
+            });
+        }
 </script>
 
     
