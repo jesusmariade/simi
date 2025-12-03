@@ -177,90 +177,86 @@
             });
         }
     </script>-->
-    <script type="module">
+<script type="module">
 import { RecetaController } from '../../controllers/RecetaController.js';
 import { RecetaMedicamentoController } from '../../controllers/RecetaMedicamentoController.js';
 
-document.addEventListener("DOMContentLoaded", iniciar);
+document.addEventListener("DOMContentLoaded", cargarPagina);
 
-async function iniciar() {
-    await cargarRecetaYMedicamentos();
-}
-
-async function cargarRecetaYMedicamentos() {
-
-    // 1. Obtener ID de la cita
+async function cargarPagina() {
     const id_cita = localStorage.getItem("id_cita");
+
     if (!id_cita) {
-        console.error("No hay id_cita");
+        alert("No se encontró una cita seleccionada");
+        location.href = "cita-paciente.html";
         return;
     }
 
-    // 2. Obtener la receta
+    // 1. Obtener receta por cita
     const { receta, error } = await RecetaController.obtenerRecetaporId(id_cita);
 
-    if (error) {
-        console.error("Error al cargar receta:", error);
-        return;
-    }
-
-    renderizarRecetas(receta);
-
-    if (!receta || receta.length === 0) {
-        console.warn("La cita no tiene receta todavía.");
+    if (error || !receta || receta.length === 0) {
+        console.error("No se encontró una receta", error);
         document.querySelector(".tabla-receta-detalles").style.display = "none";
         return;
     }
 
-    // 3. Tomar id_receta correcto
-    const id_receta = receta[0].id_receta;
+    const r = receta[0];
 
-    // 4. Cargar medicamentos de esa receta
-    const { RecetaMedicamento, error: errorRM } =
+    // Llenar tabla principal
+    const tbodyRec = document.querySelector(".tabla-receta tbody");
+    tbodyRec.innerHTML = `
+        <tr>
+            <td>${r.id_receta}</td>
+            <td>${r.id_cita}</td>
+            <td>${r.fecha_expedicion}</td>
+            <td>${r.surtida ? "Sí" : "No"}</td>
+        </tr>
+    `;
+
+    // Guardar para otras páginas si se necesita
+    localStorage.setItem("id_receta", r.id_receta);
+
+    // 2. Traer los medicamentos
+    cargarMedicamentos(r.id_receta);
+}
+
+async function cargarMedicamentos(id_receta) {
+    const { RecetaMedicamento, error } =
         await RecetaMedicamentoController.obtenerRecetaMedicamentoporid(id_receta);
 
-    if (errorRM) {
-        console.error("Error cargando medicamentos:", errorRM);
+    const tbodyMed = document.querySelector(".tabla-receta-detalles tbody");
+
+    if (error || !RecetaMedicamento || RecetaMedicamento.length === 0) {
+        tbodyMed.innerHTML = `<tr><td colspan="5">No hay medicamentos en esta receta.</td></tr>`;
         return;
     }
 
-    renderizarRecetasMedicamento(RecetaMedicamento);
-}
+    tbodyMed.innerHTML = "";
 
-// 5. Render tabla receta
-function renderizarRecetas(receta) {
-    const tbody = document.querySelector(".tabla-receta tbody");
-    tbody.innerHTML = "";
-
-    receta.forEach(r => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${r.id_receta}</td>
-                <td>${r.id_cita}</td>
-                <td>${r.fecha_expedicion}</td>
-                <td>${r.surtida}</td>
-            </tr>
+    RecetaMedicamento.forEach(rm => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${rm.id_receta}</td>
+            <td>${rm.medicamento?.nombre || "???"} (${rm.id_medicamento})</td>
+            <td>${rm.cantidad}</td>
+            <td>${rm.dosis || ""}</td>
+            <td>${rm.comprado ? "Sí" : "No"}</td>
         `;
+        tbodyMed.appendChild(tr);
     });
 }
 
-// 6. Render tabla medicamentos
-function renderizarRecetasMedicamento(rmLista) {
-    const tbody = document.querySelector(".tabla-receta-detalles tbody");
-    tbody.innerHTML = "";
+// Header
+fetch('../../../../header.html')
+    .then(res => res.text())
+    .then(data => document.getElementById('header-container').innerHTML = data);
 
-    rmLista.forEach(rm => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${rm.id_receta}</td>
-                <td>${rm.medicamento?.nombre}</td>
-                <td>${rm.cantidad}</td>
-                <td>${rm.dosis}</td>
-                <td>${rm.comprado}</td>
-            </tr>
-        `;
-    });
-}
+// Footer
+fetch('../../../../footer.html')
+    .then(res => res.text())
+    .then(data => document.getElementById('footer-container').innerHTML = data);
+
 </script>
 </body>
 </html>

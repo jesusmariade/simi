@@ -17,6 +17,7 @@
             <div class="botones-paciente">
             <button class="botonregreso" onclick="location.href='../sucursales/bienvenido.html'">Regresar</button>
             <button class="botonagregar" onclick="location.href='agregarpacientes.html'">Agregar paciente</button>
+            <button id="btn-cerrar-sesion" class="botonregreso" aria-label="Cerrar sesión">Cerrar Sesión</button>
         </div>
     </div>
         <div class="tabla-pacientes">
@@ -45,6 +46,11 @@
         <script type="module">
             //importo controlador
             import {PacienteController} from '../../controllers/pacienteController.js';
+            import { AuthController } from '../../controllers/AuthController.js';
+
+            if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('recepcionista')) {
+                window.location.href = '../Login/login.html';
+            }
             //cargar pacientitos
             document.addEventListener("DOMContentLoaded",cargarPacientes);
             //la funcion para cargarlos
@@ -137,6 +143,13 @@
                 });
 
                 }
+                }
+
+            const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+            if (btnCerrarSesion) {
+                btnCerrarSesion.addEventListener('click', () => {
+                    AuthController.cerrarSesion();
+                });
             }
 
         </script>
