@@ -86,21 +86,3 @@ function startServer(port, attempt = 0, maxAttempts = 10) {
 
 // Inicia con DEFAULT_PORT (si está ocupado intentará puertos siguientes)
 startServer(DEFAULT_PORT);
-
-app.listen(PORT, HOST, () => {
-	// obtener IP local para compartir en LAN
-	const nets = os.networkInterfaces();
-	let localIp = "localhost";
-	for (const name of Object.keys(nets)) {
-		for (const net of nets[name]) {
-			if (net.family === "IPv4" && !net.internal) {
-				localIp = net.address;
-				break;
-			}
-		}
-		if (localIp !== "localhost") break;
-	}
-	console.log(`Servidor corriendo en:`);
-	console.log(`- Local: http://localhost:${PORT}`);
-	console.log(`- LAN   : http://${localIp}:${PORT}  (comparte esto si tu firewall lo permite)`);
-});
