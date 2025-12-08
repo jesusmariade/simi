@@ -6,6 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinica Simi - Editar Medico</title>
     <link rel="stylesheet" href="../../styles/components.css">
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
 </head>
 <body>
     <!--header-->
@@ -70,10 +86,11 @@
     
     <script type="module">
         //codigo para que guarde y en enseñe datos
-        import { MedicoController } from '../../controllers/MedicoController.js';
+        import { MedicoController } from '/src/controllers/MedicoController.js';
         
         //cargar codigo de medico que pasamos desde medicos
-         window.addEventListener('DOMContentLoaded', async () => {
+         //window.addEventListener('DOMContentLoaded', async () => {
+        (async function () {
             const codigo = localStorage.getItem('codigo_medico');
             const titulo = document.getElementById('codigo-medico')
             if(!codigo){
@@ -125,21 +142,21 @@
             alert('datos actualizados');
             window.location.href='medico.html';
         });
-    });
+    })();
     
 
     </script>
     
     <script>
         //cargar header
-        fetch('../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar el footer
-        fetch('../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

@@ -1,11 +1,14 @@
 //src/services/LicenciaService.js
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
+
 
 export class LicenciaService {
 
     // Crear una nueva licencia
     static async crearLicencia(codigoMedico, fechaInicio, fechaFin) {
         try {
+            const supabase = await getSupabaseClient();
             // Calculamos duracion
             const inicio = new Date(fechaInicio);
             const fin = new Date(fechaFin);
@@ -33,6 +36,7 @@ export class LicenciaService {
     //obtener licencias por medico
     static async ObtenerLicenciaPorMedico(codigo_medico){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('licencia')
             .select('*')
@@ -49,6 +53,7 @@ export class LicenciaService {
     // Obtener todas las licencias
     static async obtenerLicencias() {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('licencia')
                 .select('*')
@@ -65,6 +70,7 @@ export class LicenciaService {
     // Obtener una licencia por ID
     static async obtenerLicenciaPorId(idLicencia) {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('licencia')
                 .select('*')
@@ -82,6 +88,7 @@ export class LicenciaService {
     // Actualizar una licencia
     static async actualizarLicencia(idLicencia, datos) {
         try {
+            const supabase = await getSupabaseClient();
             let { fecha_inicio, fecha_fin } = datos;
 
             // Recalcular duración si cambian fechas
@@ -108,6 +115,7 @@ export class LicenciaService {
     // Eliminar una licencia
     static async eliminarLicencia(idLicencia) {
         try {
+            const supabase = await getSupabaseClient();
             const { error } = await supabase
                 .from('licencia')
                 .delete()

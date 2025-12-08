@@ -1,9 +1,11 @@
 // src/services/RecetaService.js
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 export class RecetaService {
     // Crear una nueva receta asociada a una cita ahora vamos a crear el controlador y nuestro modelo 
     static async crearReceta(idCita) {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('receta')
                 .insert({
@@ -26,6 +28,7 @@ export class RecetaService {
     // Agregar un medicamento a una receta noooooo guardaaa las recetaaas aaaaaaaaaaaa
 static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis, comprado) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('receta_medicamento')
             .insert({
@@ -50,6 +53,7 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
 //parte para obtener receta a traves de la id de la cita
     static async obtenerRecetaporId(id_cita){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('receta')
             .select('*')
@@ -65,6 +69,7 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
     }
 //funcion para surtir receta con el boton
     static async SurtirReceta(id_receta){
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('receta')
             .update({ surtida: true })
@@ -78,6 +83,7 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
     //para editar
    static async obtenerRecetaporCita(id_cita) {
     try {
+        const supabase = await getSupabaseClient();
         const { data: receta, error } = await supabase
             .from('receta')
             .select(`
@@ -107,6 +113,7 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
 // Actualizar medicamento en la receta usando la PK compuesta
 static async actualizarMedicamentoReceta(idReceta, idMedicamentoOld, idMedicamentoNew, cantidad, dosis) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('receta_medicamento')
             .update({
@@ -131,6 +138,7 @@ static async actualizarMedicamentoReceta(idReceta, idMedicamentoOld, idMedicamen
 // Eliminar medicamento de receta (llave compuesta)
 static async eliminarMedicamentoReceta(id_receta, id_medicamento) {
     try {
+        const supabase = await getSupabaseClient();
         const { error } = await supabase
             .from('receta_medicamento')
             .delete()

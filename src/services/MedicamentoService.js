@@ -1,9 +1,12 @@
 // src/services/MedicamentoService.js
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
+
 
 export class MedicamentoService {
     static async obtenerTodos() {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('medicamento')
                 .select('*')
@@ -21,6 +24,7 @@ export class MedicamentoService {
 
     static async obtenerPorId(idMedicamento) {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('medicamento')
                 .select('*')
@@ -38,6 +42,7 @@ export class MedicamentoService {
     }
     static async obtenerPorFarmacia(idFarmacia) {
         try {
+            const supabase = await getSupabaseClient();
             const { data, error } = await supabase
                 .from('inventario')
                 .select(`

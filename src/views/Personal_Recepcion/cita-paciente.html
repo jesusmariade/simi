@@ -6,6 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consultorio simi - Pagina Paciente</title>
     <link rel="stylesheet" href="../../styles/components.css">
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
 </head>
 <body>
     <!--header-->
@@ -120,16 +136,17 @@
     <script type="module">
         import { CitaController } from "../../controllers/CitaController.js";
 
-window.addEventListener('DOMContentLoaded', () => {
+//window.addEventListener('DOMContentLoaded', () => {
     const nombre_completo = localStorage.getItem('nombre_completo');
     const titulo = document.getElementById('paciente-nombre');
     if (titulo) {
         titulo.textContent = `Atendiendo al Paciente: ${nombre_completo}`;
     }
-});
+//});
 
 //cargar citas
-document.addEventListener("DOMContentLoaded", cargarCitas);
+//document.addEventListener("DOMContentLoaded", cargarCitas);
+cargarCitas();
 
 async function cargarCitas() {
     const curp = localStorage.getItem("curp");

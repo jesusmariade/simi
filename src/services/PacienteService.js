@@ -1,10 +1,12 @@
 //src/services/PacienteService.js
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
 export class PacienteService {
     //obtiene pacientes en general
     static async obtenerPacientes() {
     try{
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
         .from('paciente')
         .select('*');
@@ -20,6 +22,7 @@ export class PacienteService {
     //obtener solo pacientes por curp
     static async obtenerPacientesporCurp(curp){
         try{
+            const supabase = await getSupabaseClient();
            const {data,error} = await supabase
            .from('paciente')
            .select('*')
@@ -36,7 +39,9 @@ export class PacienteService {
     }
     //agregas los pacientes
      static async agregarPaciente(paciente) {
-       try{ const { data, error } = await supabase
+       try{ 
+            const supabase = await getSupabaseClient();
+            const { data, error } = await supabase
             .from('paciente')
             .insert({
                 curp: paciente.curp,
@@ -62,6 +67,7 @@ export class PacienteService {
     //actualiza datos de los pacientes
     static async actualizarPaciente(paciente, curp) {
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('paciente')
             .update({
@@ -88,6 +94,7 @@ export class PacienteService {
     //elimina los pacientes dah
     static async eliminarPaciente(curp) {
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('paciente')
             .delete()
@@ -107,6 +114,7 @@ export class PacienteService {
     //actualizar solo estado del paciente(funcion se usara en 2 partes)
      static async ActualizarEstado(curp,paciente) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('paciente')
             .update({
@@ -125,6 +133,7 @@ export class PacienteService {
     }
     static async obtenerEstadoPaciente(curp) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('paciente')
             .select('descripcion_deestado, nombre_completo')

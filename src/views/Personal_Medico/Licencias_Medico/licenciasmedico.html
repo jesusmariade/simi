@@ -5,6 +5,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Solicitar Licencia</title>
         <link rel="stylesheet" href="../../../styles/components.css">
+         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
     </head>
     <body>
         <div id="header-container"></div>

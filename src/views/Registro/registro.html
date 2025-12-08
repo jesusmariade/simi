@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
     <link rel="stylesheet" href="../../styles/components.css">
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
 </head>
 <body class="register-body">
 <script>
@@ -65,7 +81,7 @@
     <div id="footer-container"></div>
    
     <script type="module">
-        import { AuthService } from '../../services/AuthService.js';
+        import { AuthService } from '/src/services/AuthService.js';
         
         const formRegistro = document.getElementById('formregistro');
         const errorMessage = document.getElementById('error-message');
@@ -121,12 +137,12 @@
     </script>
     <script>
         // Header
-        fetch('../../../../header.html')
+        fetch('/header.html')
             .then(res => res.text())
             .then(data => document.getElementById('header-container').innerHTML = data);
 
         // Footer
-        fetch('../../../../footer.html')
+        fetch('/footer.html')
             .then(res => res.text())
             .then(data => document.getElementById('footer-container').innerHTML = data);
 

@@ -1,0 +1,10 @@
+node_modules          # No copiar node_modules (se instala de nuevo)
+npm-debug.log        # No copiar logs
+.git                 # No copiar la carpeta .git (no se necesita)
+.gitignore           # No copiar .gitignore
+.env                 # No copiar archivos .env (usaremos variables de entorno)
+.DS_Store            # Archivos del sistema Mac
+*.md                 # No copiar archivos markdown (README, etc.)
+LICENSE              # No copiar LICENSE
+CONTRIBUTING.md      # No copiar este archivo
+public/ArcInstaller.exe  # No copiar el .exe que encontramos

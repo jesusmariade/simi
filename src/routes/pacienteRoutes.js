@@ -2,13 +2,13 @@
 
 import { Router } from "express";
 import path from "path";
-import { PacienteController } from "../controllers/MedicoController.js"
+import { PacienteController } from "../controllers/PacienteController.js";
 
 const router = Router();
 
 //ruta principal
-router.get("/", (req,res) =>{
-    return res.sendFile(path.join(process.cwd(), "src", "views", "Personal_Recepcion", "Pacientes.html"))
+router.get("/", (req,res) => {
+    return res.sendFile(path.join(process.cwd(), "src", "views", "Personal_Recepcion", "pacientes.html"));
 });
-//esas no se ocupan no las pongas todavia por algo estan comen
-//me llega al pincho 🥵
+
+export default router;

@@ -6,8 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmacia Simi - Sucursal Bienvenida</title>
     <link rel="stylesheet" href="../../styles/components.css">
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
 </head>
-<body>
+<body class="fondito">
     <!--header-->
     <div id="header-container"></div>
     <!--fin de header-->
@@ -44,7 +60,7 @@
     <!--cargar header-->
   <script>
     // Cargar header
-    fetch('../../../header.html')
+    fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
@@ -52,7 +68,7 @@
         .catch(error => console.error('Error al cargar el header:', error));
 
     // Cargar footer
-    fetch('../../../footer.html')
+    fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

@@ -5,12 +5,31 @@ import path from "path";
 import os from "os";
 import farmaciaRoutes from "./routes/farmaciaRoutes.js";
 import sucursalRoutes from "./routes/sucursalRoutes.js";
+import medicoRoutes from "./routes/medicoRoutes.js";
+import pacienteRoutes from "./routes/pacienteRoutes.js";
+import citaRoutes from "./routes/citaRoutes.js";
+import licenciaRoutes from "./routes/LicenciaRoutes.js";
+//import para probar
+import configRoutes from './routes/configRoutes.js';
+
+
 
 const app = express();
+//alo puso
+// Permitir servir header.html, footer.html, index.html (desde la raíz del proyecto)
+app.use(express.static(process.cwd()));
+
+//yo puse
+app.use("/src", express.static(path.join(process.cwd(), "src")));
+
+
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//nueva linea para probar
+app.use("/api", configRoutes);
 
 // CORS básico y manejo de preflight (útil si expones con ngrok/localtunnel)
 app.use((req, res, next) => {
@@ -29,6 +48,10 @@ app.use("/views", express.static(path.join(process.cwd(), "src", "views")));
 // Rutas
 app.use("/farmacia", farmaciaRoutes);
 app.use("/sucursales", sucursalRoutes);
+app.use("/medico", medicoRoutes);
+app.use("/pacientes", pacienteRoutes);
+app.use("/citas", citaRoutes);
+app.use("/licencias", licenciaRoutes);
 
 app.get("/", (req, res) => {
 	// redirige al archivo mostrado en tu proyecto
@@ -60,7 +83,7 @@ function startServer(port, attempt = 0, maxAttempts = 10) {
 			}
 			if (localIp !== "localhost") break;
 		}
-		console.log(`Servidor corriendo en:`);
+		console.log('Servidor corriendo en:');
 		console.log(`- Local: http://localhost:${port}`);
 		console.log(`- LAN   : http://${localIp}:${port}  (comparte esto si tu firewall lo permite)`);
 	});
@@ -74,7 +97,7 @@ function startServer(port, attempt = 0, maxAttempts = 10) {
 				setTimeout(() => startServer(nextPort, attempt + 1, maxAttempts), 200);
 			} else {
 				console.error(`No se pudo iniciar el servidor: puertos ${port} - ${port + maxAttempts} ocupados.`);
-				console.error("Si quieres liberar el puerto 3000 ejecuta: netstat -ano | findstr :3000  (Windows) o sudo lsof -i :3000 (macOS/Linux) y luego mata el PID.");
+				console.error(`Si quieres liberar el puerto 3000 ejecuta: netstat -ano | findstr :3000  (Windows) o sudo lsof -i :3000 (macOS/Linux) y luego mata el PID.`);
 				process.exit(1);
 			}
 		} else {
@@ -86,21 +109,3 @@ function startServer(port, attempt = 0, maxAttempts = 10) {
 
 // Inicia con DEFAULT_PORT (si está ocupado intentará puertos siguientes)
 startServer(DEFAULT_PORT);
-
-app.listen(PORT, HOST, () => {
-	// obtener IP local para compartir en LAN
-	const nets = os.networkInterfaces();
-	let localIp = "localhost";
-	for (const name of Object.keys(nets)) {
-		for (const net of nets[name]) {
-			if (net.family === "IPv4" && !net.internal) {
-				localIp = net.address;
-				break;
-			}
-		}
-		if (localIp !== "localhost") break;
-	}
-	console.log(`Servidor corriendo en:`);
-	console.log(`- Local: http://localhost:${PORT}`);
-	console.log(`- LAN   : http://${localIp}:${PORT}  (comparte esto si tu firewall lo permite)`);
-});
