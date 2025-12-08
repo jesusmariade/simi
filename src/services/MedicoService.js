@@ -1,9 +1,11 @@
 //src/services/MedicoService.js
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
 export class MedicoService{
     static async obtenerMedicos(numero_sucursal){
         try{
+            const supabase = await getSupabaseClient();
             const {data, error} = await supabase
             .from ('medico')
             .select ('*')/*todos los campos*/
@@ -20,6 +22,7 @@ export class MedicoService{
     }
     static async CrearMedico(medicoData){
         try{
+            const supabase = await getSupabaseClient();
             const{ data,error} =await supabase
             .from('medico')
             .insert({
@@ -44,7 +47,8 @@ export class MedicoService{
     }
     //se usara para editar los datos del medico con ese codigo
     static async obtenerMedicosporCodigo(codigo){
-        try{   
+        try{  
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('medico')
             .select('*')
@@ -61,6 +65,7 @@ export class MedicoService{
     }
     static async actualizarMedico(medicoData,codigo){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('medico')
             .update({
@@ -86,7 +91,9 @@ export class MedicoService{
         }
     }
     static async EliminarMedico(codigo){
-        try{ const {error} = await supabase
+        try{ 
+            const supabase = await getSupabaseClient();
+            const {error} = await supabase
             .from('medico')//desde medico
             .delete()//borrar
             .eq('codigo',codigo);//que seleccione solo los que sean igualitos al valor

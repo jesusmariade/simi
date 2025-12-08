@@ -7,7 +7,7 @@
     "start": "node src/app.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.83.0",
+    "@supabase/supabase-js": "^2.87.0",
     "bcryptjs": "^3.0.3",
     "ejs": "^3.1.10",
     "express": "^4.21.2"

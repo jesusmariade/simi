@@ -4,8 +4,24 @@
     <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Clinica Simi - Recetas</title>
-    <link rel="stylesheet" href="../../../styles/components.css"> 
-</head>
+        <link rel="stylesheet" href="../../../styles/components.css"> 
+         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
+    </head>
 <body>
     <div id="header-container"></div>
     <main>
@@ -64,14 +80,14 @@
     <div id="footer-container"></div>
     <script>
         //cargar header
-            fetch('../../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header-container').innerHTML = data;
             })
             .catch(error => console.error('Error al cargar el header:', error));
             //cargar footer
-            fetch('../../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
@@ -79,7 +95,7 @@
             .catch(error => console.error('Error al cargar el footer:', error));
     </script>
   <!-- <script type="module">
-        import {RecetaController} from '../../../controllers/RecetaController.js';
+        import {RecetaController} from '/src/controllers/RecetaController.js';
         //vamos por partes de la tablita, primero empezaremos por receta
         //cargar receta
         document.addEventListener("DOMContentLoaded",cargarRecetas);
@@ -117,7 +133,7 @@
             tbodyA.innerHTML = "";
 
             if(!receta || receta.length == 0){
-                tbodyA.innerHTML =  `<tr><td colspan="3">No hay recetas registradas.</td></tr>`;
+                tbodyA.innerHTML =  <tr><td colspan="3">No hay recetas registradas.</td></tr>;
                 return;
             }
 
@@ -136,7 +152,7 @@
         }
     </script>
    <script type="module">
-        import {RecetaMedicamentoController} from '../../../controllers/RecetaMedicamentoController.js';
+        import {RecetaMedicamentoController} from '/src/controllers/RecetaMedicamentoController.js';
         //cargar receta medicamento
        /* document.addEventListener("DOMContentLoaded",cargarRecetasMedicamento);*/
 
@@ -161,7 +177,7 @@
             tbodyA.innerHTML = "";
 
             if(!RecetaMedicamento || RecetaMedicamento.length == 0){
-                tbodyA.innerHTML =  `<tr><td colspan="5">No hay medicamentos en esta receta.</td></tr>`;
+                tbodyA.innerHTML =  <tr><td colspan="5">No hay medicamentos en esta receta.</td></tr>;
                 return;
             }
 
@@ -181,10 +197,11 @@
         }
     </script>-->
     <script type="module">
-        import { RecetaController } from '../../../controllers/RecetaController.js';
-        import { RecetaMedicamentoController } from '../../../controllers/RecetaMedicamentoController.js';
+        import { RecetaController } from '/src/controllers/RecetaController.js';
+        import { RecetaMedicamentoController } from '/src/controllers/RecetaMedicamentoController.js';
 
-        document.addEventListener("DOMContentLoaded", iniciar);
+       // document.addEventListener("DOMContentLoaded", iniciar);
+       iniciar();
 
         async function iniciar() {
             const id_cita = localStorage.getItem("id_cita");

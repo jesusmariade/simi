@@ -6,6 +6,22 @@
     <title>Farmacia Simi - Panel de Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../styles/components.css">
+	 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
 </head>
 <body>
 	<!-- Contenedores para header y footer -->
@@ -71,11 +87,12 @@
 	<script>
 		// Helper para cargar partials con fallback
 		async function loadPartial(name, targetId) {
-			const targets = [
-				`../../../${name}.html`,
-				`../../../../${name}.html`,
-				`../../../public/${name}.html`
-			];
+			const targets = [`
+				/${name}.html,
+				/public/${name}.html,
+				../../../${name}.html,
+				../../../../${name}.html
+			`];
 			const container = document.getElementById(targetId);
 			if (!container) return;
 			for (const url of targets) {
@@ -101,11 +118,11 @@
 
 	<!-- Script para inicializar el controlador -->
 	<script type="module">
-		import { FarmaciaController } from '../../controllers/FarmaciaController.js';
-		import { AuthController } from '../../controllers/AuthController.js';
+		import { FarmaciaController } from '/src/controllers/FarmaciaController.js';
+		import { AuthController } from '/src/controllers/AuthController.js';
 
 		if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('farmaceutico')) {
-			window.location.href = '../Login/login.html';
+			window.location.href = '/src/views/Login/login.html';
 		}
 		
 		const formPanel = document.getElementById('form-registrar');
@@ -284,8 +301,37 @@
 					const editId = formVenta.dataset.editId;
 					
 					if (editId) {
-						// TODO: Implementar actualización de venta
-						alert('La funcionalidad de editar ventas aún no está implementada. Por favor, elimina y crea una nueva venta.');
+						console.log('=== MODO EDICIÓN ACTIVADO ===', editId);
+
+						const ventaData = {
+							total: medicamentosVenta.reduce((sum, med) => sum + med.subtotal, 0),
+						};
+
+						console.log('Datos a enviar a actualización:', ventaData, 'medicamentos:', medicamentosVenta);
+
+						const { venta, error } = await FarmaciaController.actualizarVenta(editId, ventaData, medicamentosVenta);
+
+						console.log('Respuesta actualizar venta:', { venta, error });
+
+						if (error) {
+							alert('Error al actualizar la venta: ' + (error.message || JSON.stringify(error)));
+							return;
+						}
+
+						alert('Venta actualizada con éxito');
+
+						// limpiar modo edición
+						formVenta.removeAttribute('data-edit-id');
+						medicamentosVenta = [];
+						actualizarListaMedicamentos();
+						formVenta.reset();
+						if (formPanel) {
+							formPanel.classList.add('hidden');
+							formPanel.setAttribute('aria-hidden', 'true');
+						}
+
+						// refrescar lista
+						await FarmaciaController.inicializar();
 						return;
 					} else {
 						console.log('Enviando array al controller. Cantidad de medicamentos:', medicamentosVenta.length);
@@ -323,9 +369,9 @@
 			});
 		}
 		
-		document.addEventListener('DOMContentLoaded', () => {
+		//document.addEventListener('DOMContentLoaded', () => {
 			FarmaciaController.inicializar();
-		});
+		//});
 
 		const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 		if (btnCerrarSesion) {

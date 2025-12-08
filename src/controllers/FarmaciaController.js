@@ -6,6 +6,7 @@ import { RecetaMedicamentoService } from '../services/RecetaMedicamentoService.j
 import { Venta } from '../models/Venta.js';
 import { Receta } from '../models/Receta.js';
 import { Medicamento } from '../models/Medicamento.js';
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
 export class FarmaciaController {
     static async cargarRecetas() {
@@ -269,28 +270,15 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
     }
 }
 
-    static async actualizarVenta(idVenta, ventaData) {
-        try {
-            const venta = {
-                total: parseFloat(ventaData.total),
-                tipo: 'venta',
-                fecha_venta: new Date().toISOString().split('T')[0]
-            };
-            
-            const { data, error } = await FarmaciaService.actualizarVenta(idVenta, venta);
-            
-            if (error) {
-                console.error('Error al actualizar venta:', error);
-                return { venta: null, error };
-            }
-            
-            return { venta: data, error: null };
-        } catch (error) {
-            console.error('Error:', error);
-            return { venta: null, error };
-        }
+    static async actualizarVenta(idVenta, ventaData, medicamentosArray = []) {
+    try {
+      const { data, error } = await FarmaciaService.actualizarVenta(idVenta, ventaData, medicamentosArray);
+      return { venta: data, error };
+    } catch (error) {
+      console.error('Error en FarmaciaController.actualizarVenta:', error);
+      return { venta: null, error };
     }
-
+  }
     static async eliminarVenta(idVenta) {
         try {
             const { success, error } = await FarmaciaService.eliminarVenta(idVenta);
@@ -516,29 +504,36 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
         container.appendChild(ul);
     }
 
-    static async abrirFormularioEditar(venta) {
+     static async abrirFormularioEditar(venta) {
         const formPanel = document.getElementById('form-registrar');
         const formVenta = document.getElementById('formVenta');
         
         if (!formVenta || !formPanel) return;
         
-        // Guardar ID para edición
+        // ✅ CAMBIO: Guardar ID para edición
         formVenta.dataset.editId = venta.id_venta;
+        console.log('Abriendo formulario de edición para venta:', venta.id_venta);
         
-        // Cargar medicamentos si no están cargados
+        // ✅ CAMBIO: Cargar medicamentos si no están cargados
         const selectMedicamento = document.getElementById('select-medicamento');
         if (selectMedicamento && selectMedicamento.options.length <= 1) {
-            const { medicamentos } = await FarmaciaController.cargarMedicamentos();
-            FarmaciaController.llenarSelectMedicamentos(medicamentos, selectMedicamento);
+            console.log('Cargando medicamentos...');
+            const { medicamentos, error } = await FarmaciaController.cargarMedicamentos();
+            
+            if (!error && medicamentos && medicamentos.length > 0) {
+                FarmaciaController.llenarSelectMedicamentos(medicamentos, selectMedicamento);
+                console.log('Medicamentos cargados:', medicamentos.length);
+            } else {
+                console.error('Error cargando medicamentos:', error);
+            }
         }
         
-        // Limpiar formulario
+        // ✅ CAMBIO: Limpiar formulario
         if (formVenta) {
             formVenta.reset();
         }
         
-        // Cargar medicamentos de la venta en el formulario
-        // Nuevo sistema: múltiples medicamentos desde venta_medicamento
+        // ✅ IGUAL: Cargar medicamentos de la venta en el formulario
         let medicamentosVentaMedicamento = [];
         if (venta.venta_medicamento) {
             if (Array.isArray(venta.venta_medicamento)) {
@@ -548,17 +543,27 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
             }
         }
         
-        // Si hay medicamentos, cargarlos en el formulario usando la función expuesta
-        if (medicamentosVentaMedicamento.length > 0 && window.cargarMedicamentosEnFormulario) {
-            window.cargarMedicamentosEnFormulario(medicamentosVentaMedicamento);
-        } else if (window.limpiarMedicamentosFormulario) {
-            // Si no hay medicamentos, limpiar el formulario
-            window.limpiarMedicamentosFormulario();
+        console.log('Medicamentos a cargar en formulario:', medicamentosVentaMedicamento);
+        
+        // ✅ CAMBIO: Usar la función expuesta correctamente
+        if (medicamentosVentaMedicamento.length > 0) {
+            if (typeof window.cargarMedicamentosEnFormulario === 'function') {
+                window.cargarMedicamentosEnFormulario(medicamentosVentaMedicamento);
+                console.log('Medicamentos cargados en formulario');
+            } else {
+                console.error('Función cargarMedicamentosEnFormulario no disponible');
+            }
+        } else {
+            if (typeof window.limpiarMedicamentosFormulario === 'function') {
+                window.limpiarMedicamentosFormulario();
+                console.log('Formulario limpiado (sin medicamentos)');
+            }
         }
         
-        // Mostrar panel
+        // ✅ IGUAL: Mostrar panel
         formPanel.classList.remove('hidden');
         formPanel.setAttribute('aria-hidden', 'false');
+        console.log('Panel abierto');
     }
 
     static async inicializar() {

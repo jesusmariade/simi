@@ -1,14 +1,25 @@
-<!DOCTYPE html>
+<!--/src/views/sucursales/sucursales.html-->
+<!--<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmacia Simi - Sucursales</title>
     <link rel="stylesheet" href="../../styles/components.css">
+    Cargar Supabase antes de los módulos -->
+    <!--<script type="module">
+        // Cargar Supabase desde CDN y hacerlo disponible globalmente
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+        window.supabase = createClient(
+            'https://augycbgsquurallcmzir.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1Z3ljYmdzcXV1cmFsbGNtemlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NjIzMzYsImV4cCI6MjA3ODUzODMzNn0.yNce0WIZiV3HWUUTxLxWSDSTVao-yTwCuoIbSjZc3a4'
+        );
+        window.supabaseLoaded = true;
+    </script>
 </head>
-<body>
+<body>-->
 <!-- Aquí se cargará el header -->
-    <div id="header-container"></div>
+   <!-- <div id="header-container"></div>
 
 <main class="sucursales-main">
     <div class="sucursales-header">
@@ -18,43 +29,148 @@
     
     <div class="sucursales-aparicion">
     <div class="sucursales-container" id="sucursales-container">
-        <!-- Las sucursales se cargarán aquí cuando tenamos suicursales registradas en nuestra base de datos obvio vamos a acregar un evento 
+    --> <!-- Las sucursales se cargarán aquí cuando tenamos suicursales registradas en nuestra base de datos obvio vamos a acregar un evento 
          que suceda cada que se le haga click a alguna sucursal pase a nuestra siguiente vista con los datos de la sucursale que sea elegida entendido? -->
-    </div></div>
+   <!-- </div></div>
 </main>
-
+-->
     <!-- Aquí se cargará el footer -->
-    <div id="footer-container"></div>
-
+    <!--<div id="footer-container"></div>
+-->
     <!-- SCRIPT PARA CARGAR HEADER Y FOOTER -->
-    <script>
+   <!-- <script>
     // Cargar header
-    fetch('../../../header.html')
+    fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
-        .catch(error => console.error('Error cargando header:', error));
+        .catch(error => {
+            console.error('Error cargando header:', error);
+            fetch('../../../header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-container').innerHTML = data;
+            })
+            .catch(err => console.error('Error en fallback header:', err));
+        });
     
     // Cargar footer
-    fetch('../../../footer.html')
+    fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
         })
-        .catch(error => console.error('Error cargando footer:', error));
-    </script>
-
-    <!-- Script para inicializar el controlador  si asi es java -->
-    <script type="module">
-        import { SucursalController } from '../../controllers/SucursalController.js';
-        
-
-        document.addEventListener('DOMContentLoaded', () => {
-            SucursalController.inicializar();
+        .catch(error => {
+            console.error('Error cargando footer:', error);
+            fetch('../../../footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            })
+            .catch(err => console.error('Error en fallback footer:', err));
         });
+    </script>
+-->
+    <!-- Script para inicializar el controlador  si asi es java -->
+    <!--<script type="module">
+        // Esperar a que Supabase se cargue antes de importar el controlador
+        if (window.supabaseLoaded !== true) {
+            await new Promise(resolve => {
+                const checkSupabase = setInterval(() => {
+                    if (window.supabase || window.supabaseLoaded === true) {
+                        clearInterval(checkSupabase);
+                        resolve();
+                    }
+                }, 50);
+                // Timeout de seguridad
+                setTimeout(() => {
+                    clearInterval(checkSupabase);
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        import { SucursalController } from '/src/controllers/SucursalController.js';
+
+        //document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await SucursalController.inicializar();
+            } catch (error) {
+                console.error('Error al inicializar sucursales:', error);
+                const container = document.getElementById('sucursales-container');
+                if (container) {
+                    container.innerHTML = '<p style="color: red;">Error al cargar las sucursales. Por favor recarga la página.</p>';
+                }
+            }
+       //});
     </script>
 
 </body>
-</html>
+</html>-->
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmacia Simi - Sucursales</title>
+    <link rel="stylesheet" href="../../styles/components.css">
+
+    <!-- Cargar UMD de Supabase ANTES de cualquier script module -->
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+      (async () => {
+        try {
+          const response = await fetch('/api/supabase-config');
+          const config = await response.json();
+          
+          window.supabase = window.supabase.createClient(config.url, config.anonKey);
+          window.supabaseLoaded = true;
+          console.log('Supabase inicializado desde servidor');
+        } catch (e) {
+          console.error('Error cargando config de Supabase:', e);
+          window.supabaseLoaded = false;
+        }
+      })();
+    </script>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <main class="sucursales-main">
+        <div class="sucursales-header">
+            <h1>Sucursales</h1><br>
+            <p>Por favor seleccione la sucursal en la que trabaja</p>
+        </div>
+        
+        <div class="sucursales-aparicion">
+            <div class="sucursales-container" id="sucursales-container">
+                <!-- Las sucursales se cargarán aquí -->
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        // Cargar header y footer
+        fetch('/header.html').then(r => r.text()).then(html => document.getElementById('header-container').innerHTML = html);
+        fetch('/footer.html').then(r => r.text()).then(html => document.getElementById('footer-container').innerHTML = html);
+    </script>
+
+    <script type="module">
+        import { SucursalController } from '/src/controllers/SucursalController.js';
+
+        try {
+            await SucursalController.inicializar();
+        } catch (error) {
+            console.error('Error al inicializar sucursales:', error);
+            const container = document.getElementById('sucursales-container');
+            if (container) {
+                container.innerHTML = '<p style="color: red;">Error al cargar las sucursales. Por favor recarga la página.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

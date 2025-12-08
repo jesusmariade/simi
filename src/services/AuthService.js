@@ -2,15 +2,17 @@
 va a verificar las contraseñas busca el usuario 
  retorna si es valido 
  y correspondiente a el tipo de usuario a y crear un nuevo usuario tambien */ 
-
-import supabase from '../../supabase/supabaseClient.js';
+/* se cambio import supabase from por {getSupabaseClient}*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 import { Usuario } from "../models/Usuario.js";
 
 export class AuthService {
+    
     //verificamos la contraseña del usuario 
     static async verificarPassword(password, hash){
         return new Promise(async (resolve) => {
             try {
+                const supabase = await getSupabaseClient();
                 if (typeof window !== 'undefined' && window.bcryptjsLoaded) {
                     await window.bcryptjsLoaded;
                 }
@@ -63,6 +65,7 @@ export class AuthService {
 //iniciamos sesion 
 static async iniciarSesion(email, password){
  try {
+    const supabase = await getSupabaseClient();
     console.log('Intentando iniciar sesión con email:', email);
     
     //buscarel usuario por email 
@@ -103,6 +106,7 @@ if (!passwordValido){
 //OBTENEMOS EL USUARIO POR EL id        
 static async obtenerUsuarioPorId(id){
     try{
+        const supabase = await getSupabaseClient();
         const {data: UsuarioData, error} = await supabase
     .from("usuarios")
     .select("*")
@@ -122,6 +126,7 @@ static async obtenerUsuarioPorId(id){
 //metodo para crear el nuevo usuario 
 static async crearUsuario(usuarioData){
     try {
+        const supabase = await getSupabaseClient();
         if (typeof window !== 'undefined' && window.bcryptjsLoaded) {
             await window.bcryptjsLoaded;
         }

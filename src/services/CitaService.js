@@ -1,6 +1,7 @@
 //src/services/CitaService.js
 
-import supabase from '../../supabase/supabaseClient.js';
+/*import supabase from '../../supabase/supabaseClient.js';*/
+import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
 export class CitaService{//funciones
     //obtener citas por paciente 
@@ -23,8 +24,10 @@ export class CitaService{//funciones
             return{data:null,error};
         }
     }*/
+
    static async obtenerCitasporPaciente(curp_paciente, numero_sucursal) {
     try {
+        const supabase = await getSupabaseClient();
         const {data, error} = await supabase
             .from('cita')
             .select(`
@@ -48,6 +51,7 @@ export class CitaService{//funciones
     //obtenere citas por medico
     static async obtenerCitasporMedico(codigo_medico){
         try{
+            const supabase = await getSupabaseClient();
             const {data, error} = await supabase
             .from ('cita')
             .select ('*')
@@ -65,6 +69,7 @@ export class CitaService{//funciones
     //crear cita
     static async crearCita(citaData){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from ('cita')
             .insert({
@@ -89,6 +94,7 @@ export class CitaService{//funciones
     //funcion de obtener cita por id_cita(esta es para que funcione actualizar cita)
   static async obtenerCitaPorId(id_cita) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from("cita")
             .select("*")
@@ -104,6 +110,7 @@ export class CitaService{//funciones
     //funcion para editar cita
     static async actualizarCita(citaData,id_cita){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('cita')
             .update({
@@ -129,6 +136,7 @@ export class CitaService{//funciones
     //funcion para eliminar  si tienen dudas me dicen jeje ya me voy (oka xdxdxd - ATTE: yo)(oki att.alo)
     static async eliminarcita(id_cita){
         try{
+            const supabase = await getSupabaseClient();
             const {data,error} = await supabase
             .from('cita')
             .delete()
@@ -146,6 +154,7 @@ export class CitaService{//funciones
     //funcion para cancelar cita
     static async cancelarCita(id_cita) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('cita')
             .update({ cancelada: true })
@@ -162,6 +171,7 @@ export class CitaService{//funciones
     //funcion para reactivar cita
     static async reactivarCita(id_cita) {
     try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
             .from('cita')
             .update({ cancelada: false })
