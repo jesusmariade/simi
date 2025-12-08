@@ -43,16 +43,18 @@
         </main>
         <!--footer-->
         <div id="footer-container"></div>
-        <script type="module">
+        <script type="module" defer>
             //importo controlador
-            import {PacienteController} from '../../controllers/pacienteController.js';
-            import { AuthController } from '../../controllers/AuthController.js';
+            import {PacienteController} from '/src/controllers/PacienteController.js';
+            import { AuthController } from '/src/controllers/AuthController.js';
 
             if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('recepcionista')) {
                 window.location.href = '../Login/login.html';
             }
             //cargar pacientitos
-            document.addEventListener("DOMContentLoaded",cargarPacientes);
+            //document.addEventListener("DOMContentLoaded",cargarPacientes);
+            cargarPacientes();
+            
             //la funcion para cargarlos
             async function cargarPacientes(){
                 try{
@@ -71,7 +73,7 @@
                     tbody.innerHTML = "";//tablita limpia
                     //que mensaje da si no hay nada en la tabla 
                     if(!pacientes || pacientes.length === 0){
-                        tbody.innerHTML = `<tr><td colspan="9">No hay pacientes en las clinicas</td></tr>`;
+                        tbody.innerHTML = ` <tr><td colspan="9">No hay pacientes en las clinicas</td></tr>`;
                         return;
                     }
                     pacientes.forEach(paciente => {

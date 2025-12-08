@@ -71,11 +71,12 @@
 	<script>
 		// Helper para cargar partials con fallback
 		async function loadPartial(name, targetId) {
-			const targets = [
-				`../../../${name}.html`,
-				`../../../../${name}.html`,
-				`../../../public/${name}.html`
-			];
+			const targets = [`
+				/${name}.html,
+				/public/${name}.html,
+				../../../${name}.html,
+				../../../../${name}.html
+			`];
 			const container = document.getElementById(targetId);
 			if (!container) return;
 			for (const url of targets) {
@@ -101,11 +102,11 @@
 
 	<!-- Script para inicializar el controlador -->
 	<script type="module">
-		import { FarmaciaController } from '../../controllers/FarmaciaController.js';
-		import { AuthController } from '../../controllers/AuthController.js';
+		import { FarmaciaController } from '/src/controllers/FarmaciaController.js';
+		import { AuthController } from '/src/controllers/AuthController.js';
 
 		if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('farmaceutico')) {
-			window.location.href = '../Login/login.html';
+			window.location.href = '/src/views/Login/login.html';
 		}
 		
 		const formPanel = document.getElementById('form-registrar');
@@ -284,9 +285,39 @@
 					const editId = formVenta.dataset.editId;
 					
 					if (editId) {
-						// TODO: Implementar actualización de venta
-						alert('La funcionalidad de editar ventas aún no está implementada. Por favor, elimina y crea una nueva venta.');
-						return;
+						console.log('=== MODO EDICIÓN ACTIVADO ===');
+						console.log('ID DE VENTA A EDITAR:', editId);
+
+						try {
+							const ventaData = {
+								total: calcularTotal(medicamentosVenta), // si ya tienes esta función, úsala
+							};
+
+							console.log('Datos a enviar a actualización:', ventaData);
+
+							const { venta, error } = await FarmaciaController.actualizarVenta(editId, ventaData);
+
+							console.log('Respuesta actualizar venta:', { venta, error });
+
+							if (error) {
+								alert('Error al actualizar la venta');
+								return;
+							}
+
+							alert('Venta actualizada con éxito');
+							
+							// Limpiar estado
+							medicamentosVenta = [];
+							actualizarListaMedicamentos();
+							formVenta.removeAttribute('data-edit-id');
+							formVenta.reset();
+
+							return;
+						} catch (err) {
+							console.error('Error al actualizar la venta:', err);
+							alert('No se pudo actualizar la venta');
+							return;
+						}
 					} else {
 						console.log('Enviando array al controller. Cantidad de medicamentos:', medicamentosVenta.length);
 						const { venta, error } = await FarmaciaController.crearVenta(medicamentosVenta);
@@ -323,9 +354,9 @@
 			});
 		}
 		
-		document.addEventListener('DOMContentLoaded', () => {
+		//document.addEventListener('DOMContentLoaded', () => {
 			FarmaciaController.inicializar();
-		});
+		//});
 
 		const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
 		if (btnCerrarSesion) {

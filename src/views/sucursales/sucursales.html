@@ -1,3 +1,4 @@
+<!--/src/views/sucursales/sucursales.html-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmacia Simi - Sucursales</title>
     <link rel="stylesheet" href="../../styles/components.css">
+    <!-- Cargar Supabase antes de los módulos -->
+    <script type="module">
+        // Cargar Supabase desde CDN y hacerlo disponible globalmente
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+        window.supabase = createClient(
+            'https://augycbgsquurallcmzir.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1Z3ljYmdzcXV1cmFsbGNtemlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NjIzMzYsImV4cCI6MjA3ODUzODMzNn0.yNce0WIZiV3HWUUTxLxWSDSTVao-yTwCuoIbSjZc3a4'
+        );
+        window.supabaseLoaded = true;
+    </script>
 </head>
 <body>
 <!-- Aquí se cargará el header -->
@@ -29,32 +40,71 @@
     <!-- SCRIPT PARA CARGAR HEADER Y FOOTER -->
     <script>
     // Cargar header
-    fetch('../../../header.html')
+    fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
-        .catch(error => console.error('Error cargando header:', error));
+        .catch(error => {
+            console.error('Error cargando header:', error);
+            fetch('../../../header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-container').innerHTML = data;
+            })
+            .catch(err => console.error('Error en fallback header:', err));
+        });
     
     // Cargar footer
-    fetch('../../../footer.html')
+    fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
         })
-        .catch(error => console.error('Error cargando footer:', error));
+        .catch(error => {
+            console.error('Error cargando footer:', error);
+            fetch('../../../footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            })
+            .catch(err => console.error('Error en fallback footer:', err));
+        });
     </script>
 
     <!-- Script para inicializar el controlador  si asi es java -->
     <script type="module">
-        import { SucursalController } from '../../controllers/SucursalController.js';
-        
+        // Esperar a que Supabase se cargue antes de importar el controlador
+        if (window.supabaseLoaded !== true) {
+            await new Promise(resolve => {
+                const checkSupabase = setInterval(() => {
+                    if (window.supabase || window.supabaseLoaded === true) {
+                        clearInterval(checkSupabase);
+                        resolve();
+                    }
+                }, 50);
+                // Timeout de seguridad
+                setTimeout(() => {
+                    clearInterval(checkSupabase);
+                    resolve();
+                }, 2000);
+            });
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            SucursalController.inicializar();
-        });
+        import { SucursalController } from '/src/controllers/SucursalController.js';
+
+        //document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await SucursalController.inicializar();
+            } catch (error) {
+                console.error('Error al inicializar sucursales:', error);
+                const container = document.getElementById('sucursales-container');
+                if (container) {
+                    container.innerHTML = '<p style="color: red;">Error al cargar las sucursales. Por favor recarga la página.</p>';
+                }
+            }
+       //});
     </script>
 
 </body>
 </html>
-

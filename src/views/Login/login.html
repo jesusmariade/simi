@@ -32,30 +32,37 @@
         <div id="footer-container"></div>
 <!--chuy diseños -->
 
-<script>
+<!-- Cargar bcrypt ANTES de AuthController -->
+<script type="module">
     window.bcryptjsLoaded = new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/bcryptjs@2/dist/bcrypt.min.js';
+
         script.onload = () => {
             console.log('bcryptjs cargado correctamente');
+
             if (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) {
                 window.bcryptjs = dcodeIO.bcrypt;
-                console.log('bcryptjs asignado desde dcodeIO');
             } else if (typeof bcryptjs !== 'undefined') {
                 window.bcryptjs = bcryptjs;
-                console.log('bcryptjs asignado directamente');
             }
             resolve(true);
         };
+
         script.onerror = () => {
             console.error('Error al cargar bcryptjs');
             resolve(false);
         };
+
         document.head.appendChild(script);
     });
+
+    await window.bcryptjsLoaded;
+    console.log("bcryptjs listo");
 </script>
+
 <script type="module">
-    import {AuthController } from '../../controllers/AuthController.js';
+    import {AuthController } from '/src/controllers/AuthController.js';
 
     const formlogin = document.getElementById('formlogin');
     const errorMessage = document.getElementById('error-message');
@@ -83,7 +90,7 @@
         errorMessage.style.display = 'none';
         errorMessage.textContent = '';
 
-        console.log('Enviando credenciales:', { email, password: '***' });
+        console.log('Enviando credenciales:', { email, password: '*' });
         const { success, error, usuario } = await AuthController.iniciarSesion(email, password);
         console.log('Respuesta del login:', { success, error, usuario });
 
@@ -113,19 +120,35 @@
 </script>
 <script>
             //cargar header
-            fetch('../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header-container').innerHTML = data;
             })
-            .catch(error => console.error('Error al cargar el header:', error));
+            .catch(error => {
+                console.error('Error al cargar el header:', error);
+                fetch('../../../header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-container').innerHTML = data;
+                })
+                .catch(err => console.error('Error en fallback header:', err));
+            });
             //cargar footer
-            fetch('../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
             })
-            .catch(error => console.error('Error al cargar el footer:', error));
+            .catch(error => {
+                console.error('Error al cargar el footer:', error);
+                fetch('../../../footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-container').innerHTML = data;
+                })
+                .catch(err => console.error('Error en fallback footer:', err));
+            });
             //para que diga el nombre de la sucursal
             window.addEventListener('DOMContentLoaded', () => {
             const sucursalNombre = localStorage.getItem('sucursalNombre') || 'Sucursal';
@@ -137,5 +160,3 @@
         </script>
     </body>
 </html>
-
-    

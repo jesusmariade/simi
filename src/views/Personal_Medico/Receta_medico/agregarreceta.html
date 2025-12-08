@@ -56,9 +56,9 @@
     
     <div id="footer-container"></div>
 <script type="module">
-import { RecetaController } from '../../../controllers/RecetaController.js';
+import { RecetaController } from '/src/controllers/RecetaController.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+//document.addEventListener('DOMContentLoaded', async () => {
 
     //obtener id
     const urlParams = new URLSearchParams(window.location.search);
@@ -169,14 +169,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         location.href = "../citas-medico.html";
     });
 
-});
+//});
 
 //headder
-fetch('../../../../header.html')
+fetch('/header.html')
     .then(res => res.text())
     .then(data => document.getElementById('header-container').innerHTML = data);
 //footer
-fetch('../../../../footer.html')
+fetch('/footer.html')
     .then(res => res.text())
     .then(data => document.getElementById('footer-container').innerHTML = data);
 

@@ -70,10 +70,11 @@
     
     <script type="module">
         //codigo para que guarde y en enseñe datos
-        import { MedicoController } from '../../controllers/MedicoController.js';
+        import { MedicoController } from '/src/controllers/MedicoController.js';
         
         //cargar codigo de medico que pasamos desde medicos
-         window.addEventListener('DOMContentLoaded', async () => {
+         //window.addEventListener('DOMContentLoaded', async () => {
+        (async function () {
             const codigo = localStorage.getItem('codigo_medico');
             const titulo = document.getElementById('codigo-medico')
             if(!codigo){
@@ -125,21 +126,21 @@
             alert('datos actualizados');
             window.location.href='medico.html';
         });
-    });
+    })();
     
 
     </script>
     
     <script>
         //cargar header
-        fetch('../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar el footer
-        fetch('../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

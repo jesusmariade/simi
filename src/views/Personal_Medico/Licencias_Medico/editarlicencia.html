@@ -41,7 +41,7 @@
 <script type="module">
 import { LicenciaController } from '../../../controllers/LicenciaController.js';
 
-window.addEventListener("DOMContentLoaded", async () => {
+(async function () {
 
     const id_licencia = localStorage.getItem("id_licencia");
 
@@ -67,7 +67,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     fechafinInput.value = licencia.fecha_fin;
     diasInput.value = licencia.duracion_dias;
 
-    // Calculador automático de duración
+    // Calculador automático
     function calcularduracion() {
         const inicio = new Date(fechainicioInput.value);
         const fin = new Date(fechafinInput.value);
@@ -100,7 +100,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     fechainicioInput.addEventListener("change", calcularduracion);
     fechafinInput.addEventListener("change", calcularduracion);
 
-    // Enviar actualización
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -130,10 +129,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "/src/views/Personal_Medico/citas-medico.html";
     });
 
-});
+})();
 </script>
-
-
     <script>
         //cargar header
         fetch('../../../../header.html')

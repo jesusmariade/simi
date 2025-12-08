@@ -102,18 +102,18 @@
     /*window.addEventListener('DOMContentLoaded', () => {
       const nombre_completo = localStorage.getItem('nombre_completo');
       const titulo = document.getElementById('paciente-nombre');
-      if (titulo && nombre_completo) titulo.textContent = `Editar cita del paciente: ${nombre_completo}`;
+      if (titulo && nombre_completo) titulo.textContent = Editar cita del paciente: ${nombre_completo};
 
       const curp = localStorage.getItem("curp");
       const inputCurp = document.getElementById("curp_paciente");
       if (curp && inputCurp) inputCurp.value = curp;
     });*/
 
-    fetch('../../../../header.html')
+    fetch('/header.html')
       .then(r => r.text()).then(t => document.getElementById('header-container').innerHTML = t)
       .catch(e => console.error('Error al cargar el header', e));
 
-    fetch('../../../../footer.html')
+    fetch('/footer.html')
       .then(r => r.text()).then(t => document.getElementById('footer-container').innerHTML = t)
       .catch(e => console.error('Error al cargar el footer', e));
   </script>
@@ -349,8 +349,6 @@
     location.href = "../cita-paciente.html";
   }
 
-  // Cargar médicos (asegurar que los values sean strings)
-// Cargar médicos (asegurar que los values sean strings)
 // Cargar médicos (asegurar que los values sean strings)
 async function cargarMedicos() {
   const select = selectMedico;
@@ -479,7 +477,8 @@ ajustarTurnoSegunHorario(selectHorario.value);
   });*/
 
   //
-  document.addEventListener("DOMContentLoaded", async () => {
+ // document.addEventListener("DOMContentLoaded", async () => {
+  (async function () {
   // 1. Mostrar nombre del paciente
   const nombre_completo = localStorage.getItem('nombre_completo');
   if (nombre_completo) {
@@ -498,7 +497,7 @@ ajustarTurnoSegunHorario(selectHorario.value);
 
   // 5. Cargar horarios disponibles para esa fecha (incluyendo horario original)
   await cargarHorariosDisponibles();
-});
+})();
 
 
   </script>

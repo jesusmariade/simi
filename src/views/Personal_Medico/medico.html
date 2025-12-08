@@ -11,8 +11,9 @@
     <body>
         <!--header-->
         <div id="header-container"></div>
+        <main>
             <div class="medico-bienvenida">
-            <h1 id="titulo-area-medica">Área de Personal Médico [id_sucursal]</h1>
+            <h1 id="titulo-area-medica"><h1 id="titulo-area-medica">Área de Personal Médico</h1>
             <p>Bienvenido al área de personal médico.</p><br>
             <div class="botones-medico">
             <button class="botonregreso" onclick="location.href='../sucursales/bienvenido.html'">Regresar</button>
@@ -63,21 +64,26 @@
             })
             .catch(error => console.error('Error al cargar el footer:', error));
         </script>
-        <script type="module">
+        <script type="module" defer>
             //dios bendiceme con el script para que funcione
             //importar controlador
-            import { MedicoController} from '../../controllers/MedicoController.js';
-            import { AuthController } from '../../controllers/AuthController.js';
+            import { MedicoController} from '/src/controllers/MedicoController.js';
+            import { AuthController } from '/src/controllers/AuthController.js';
 
             if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('medico')) {
                 window.location.href = '../Login/login.html';
             }
+
             //cargar medicos
-            document.addEventListener("DOMContentLoaded",cargarMedicos);
+            //document.addEventListener("DOMContentLoaded",cargarMedicos);
+            cargarMedicos();
             //funcion para cargarlos
             async function cargarMedicos() {
             try{
-                /*const numero_sucursal = localStorage.getItem("numero_sucursal");*/
+                const numero_sucursal = localStorage.getItem("numero_sucursal");
+
+            console.log("Numero sucursal:", numero_sucursal);
+            //console.log("Respuesta servicio:", await MedicoController.obtenerMedicos(numero_sucursal))
                 
 
                 const {medicos,error} = await MedicoController.CargarMedicos();
@@ -160,13 +166,19 @@
                 });
                 });
             }
-            window.addEventListener('DOMContentLoaded', () => {
+            /*window.addEventListener('DOMContentLoaded', () => {
             const sucursalNombre = localStorage.getItem('sucursalNombre') || 'Sucursal';
             const titulo = document.getElementById('titulo-area-medica');
             if (titulo) {
             titulo.textContent = `Área de Personal Médico ${sucursalNombre}`;
             }
-            });
+            });*/
+            const sucursalNombre = localStorage.getItem('sucursalNombre') || 'Sucursal';
+            const titulo = document.getElementById('titulo-area-medica');
+            if (titulo) {
+                titulo.textContent = `Área de Personal Médico ${sucursalNombre}`;
+            }
+
 
             const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
             if (btnCerrarSesion) {

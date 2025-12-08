@@ -99,7 +99,8 @@
         import { CitaController } from "../../controllers/CitaController.js";
         import { RecetaController } from "../../controllers/RecetaController.js";
 
-        document.addEventListener("DOMContentLoaded", cargarCitas);
+        //document.addEventListener("DOMContentLoaded", cargarCitas);
+        cargarCitas();
 
         async function cargarCitas() {
             const codigo = localStorage.getItem("codigo_medico");
@@ -239,7 +240,8 @@
     <script type="module">
         import { LicenciaController } from '../../controllers/LicenciaController.js';
 
-        document.addEventListener("DOMContentLoaded", cargarLicencias);
+       // document.addEventListener("DOMContentLoaded", cargarLicencias);
+        cargarLicencias();
 
         async function cargarLicencias() {
             const codigo = localStorage.getItem("codigo_medico");

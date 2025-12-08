@@ -15,7 +15,7 @@
             </div><br><br>
                 <div class="agregar-medico-general">
                 <form id="form-paciente">
-                    <!--No c *explota*-->
+                    <!--No c explota-->
                     <div class="edit-curp-paciente">
                         <label for="curp">CURP:</label>
                         <input type="text" id="curp" name="curp" value="[curp]" required>
@@ -43,10 +43,11 @@
                     <div class="edit-estatura-paciente">
                         <label for="estatura">Estatura (cm):</label>
                         <input type="number" id="estatura" name="estatura" value="" required>
+                    </div>
                     <div class="edit-descripcion-paciente">
                         <label for="descripcion_paciente">Descripción Médica:</label>
-                        <textarea id="descripcion_deestado" name="descripcion_deestado" value="[descripcion_deestado]" required></textarea>
-                    </div>
+                        <textarea id="descripcion_deestado" name="descripcion_deestado" required"></textarea>
+                        </div>
                     <!--separacion jejejejfhiueftncyaily4wnla-->
                         <div class="botones-medico">
                         <button type="submit" class="actualizar-paciente">Guardar cambios</button>
@@ -60,10 +61,11 @@
         <div id="footer-container"></div>
         <script type="module">
         //codigo para que guarde y en enseñe datos
-        import { PacienteController } from '../../controllers/PacienteController.js';
+        import { PacienteController } from '/src/controllers/PacienteController.js';
         
         //cargar codigo de medico que pasamos desde medicos
-         window.addEventListener('DOMContentLoaded', async () => {
+         //window.addEventListener('DOMContentLoaded', async () => {
+        (async function () {
             const curp = localStorage.getItem('curp');
             const nombre_completo = localStorage.getItem('nombre_completo');
             const titulo = document.getElementById('titulo')
@@ -110,7 +112,7 @@
                 descripcion_deestado:form.descripcion_deestado.value,
                 
             };
-            const {medico: resultado, error} = await PacienteController.actualizarPaciente(curp, pacienteActualizado);
+            const { paciente: resultado, error } = await PacienteController.actualizarPaciente(curp, pacienteActualizado);
             if(error){
                 console.log("curp original =", curp);
                 alert('No se pudo actualizar el paciente');
@@ -120,20 +122,20 @@
             alert('datos actualizados');
             window.location.href='pacientes.html';
         });
-    });
+    })();
     
 
         </script>
         <script>
         //cargar header
-        fetch('/../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('/../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

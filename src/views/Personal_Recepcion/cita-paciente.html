@@ -120,16 +120,17 @@
     <script type="module">
         import { CitaController } from "../../controllers/CitaController.js";
 
-window.addEventListener('DOMContentLoaded', () => {
+//window.addEventListener('DOMContentLoaded', () => {
     const nombre_completo = localStorage.getItem('nombre_completo');
     const titulo = document.getElementById('paciente-nombre');
     if (titulo) {
         titulo.textContent = `Atendiendo al Paciente: ${nombre_completo}`;
     }
-});
+//});
 
 //cargar citas
-document.addEventListener("DOMContentLoaded", cargarCitas);
+//document.addEventListener("DOMContentLoaded", cargarCitas);
+cargarCitas();
 
 async function cargarCitas() {
     const curp = localStorage.getItem("curp");

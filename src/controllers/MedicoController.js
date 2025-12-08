@@ -4,7 +4,7 @@ import {Medico} from '../models/Medico.js';
 export class MedicoController{
     static async CargarMedicos(){
         try{
-        const numero_sucursal = localStorage.getItem("sucursalId");
+        const numero_sucursal = localStorage.getItem("numero_sucursal");
         const { data,error} = await MedicoService.obtenerMedicos(numero_sucursal);
         if(error){
             console.error('Error al cargar medicos', error);
@@ -36,7 +36,7 @@ export class MedicoController{
     static async crearMedico(medicoData){
         try{
             //agregar sucursal??
-            const numero_sucursal = localStorage.getItem('sucursalId');
+            const numero_sucursal = localStorage.getItem('numero_sucursal');
             const medico = {
                 codigo: parseInt(medicoData.codigo),
                 curp:medicoData.curp,

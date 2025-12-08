@@ -18,7 +18,7 @@ export class PacienteController{
             return {pacientes, error: null};
         }
         catch(error){
-            return{paciente:null, error}
+            return{pacientes:null, error}
         }
     }
     //lista nos servira para editar paciente en pagina editarpacientes.html

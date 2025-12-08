@@ -15,7 +15,7 @@
             </div><br><br>
                 <div class="agregar-paciente-general">
                 <form id="form-paciente">
-                    <!--No c *explota*-->
+                    <!--No c explota-->
                     <div class="curp-paciente">
                         <label for="curp">CURP:</label>
                         <input type="text" id="curp" name="curp" maxlength="18" required placeholder="Ej: GOXJ900305HSRMPV59">
@@ -59,7 +59,7 @@
         <!--footer-->
         <div id="footer-container"></div>
         <script type="module">
-            import { PacienteController } from '../../controllers/PacienteController.js';
+            import { PacienteController } from '/src/controllers/PacienteController.js';
 
             const form = document.getElementById("form-paciente");
 
@@ -88,14 +88,14 @@
         </script>
         <script>
         //cargar header
-        fetch('/../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('/../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
