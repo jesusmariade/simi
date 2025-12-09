@@ -87,12 +87,21 @@
 	<script>
 		// Helper para cargar partials con fallback
 		async function loadPartial(name, targetId) {
+<<<<<<< HEAD
 			const targets = [`
 				/${name}.html,
 				/public/${name}.html,
 				../../../${name}.html,
 				../../../../${name}.html
 			`];
+=======
+			const targets = [
+				`/${name}.html`,
+				`/public/${name}.html`,
+				`../../../${name}.html`,
+				`../../../../${name}.html`
+			];
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 			const container = document.getElementById(targetId);
 			if (!container) return;
 			for (const url of targets) {
@@ -301,6 +310,7 @@
 					const editId = formVenta.dataset.editId;
 					
 					if (editId) {
+<<<<<<< HEAD
 						console.log('=== MODO EDICIÓN ACTIVADO ===', editId);
 
 						const ventaData = {
@@ -332,6 +342,57 @@
 
 						// refrescar lista
 						await FarmaciaController.inicializar();
+=======
+						// Editar venta existente: agrupar medicamentos y llamar al controlador que hace la operación atómica en el backend
+						const idVenta = parseInt(editId);
+
+						// Agrupar medicamentos duplicados
+						const medicamentosAgrupados = {};
+						medicamentosVenta.forEach(med => {
+							const idMed = med.id_medicamento;
+							if (medicamentosAgrupados[idMed]) {
+								medicamentosAgrupados[idMed].cantidad += med.cantidad;
+								medicamentosAgrupados[idMed].subtotal = medicamentosAgrupados[idMed].cantidad * medicamentosAgrupados[idMed].precio;
+							} else {
+								medicamentosAgrupados[idMed] = {
+									id_medicamento: med.id_medicamento,
+									nombre: med.nombre,
+									precio: med.precio,
+									cantidad: med.cantidad,
+									subtotal: med.subtotal
+								};
+							}
+						});
+
+						const medicamentosUnicos = Object.values(medicamentosAgrupados);
+
+						try {
+							console.log('Solicitando actualización de venta', idVenta, medicamentosUnicos);
+							const { venta, error } = await FarmaciaController.actualizarVentaConMedicamentos(idVenta, medicamentosUnicos);
+							if (error) {
+								console.error('Error retornado al actualizar venta:', error);
+								alert('No se pudo actualizar la venta: ' + (error.message || 'error desconocido'));
+								return;
+							}
+
+							alert('Venta actualizada correctamente');
+
+							// refrescar UI
+							medicamentosVenta = [];
+							actualizarListaMedicamentos();
+							if (formPanel) {
+								formPanel.classList.add('hidden');
+								formPanel.setAttribute('aria-hidden', 'true');
+							}
+							formVenta.reset();
+							formVenta.removeAttribute('data-edit-id');
+							FarmaciaController.inicializar();
+						} catch (err) {
+							console.error('Error al actualizar venta:', err);
+							alert('Error al actualizar la venta');
+						}
+
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 						return;
 					} else {
 						console.log('Enviando array al controller. Cantidad de medicamentos:', medicamentosVenta.length);

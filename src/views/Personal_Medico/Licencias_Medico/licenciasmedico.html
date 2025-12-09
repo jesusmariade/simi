@@ -58,7 +58,7 @@
         <script type="module">
             const codigo_medico = localStorage.getItem("codigo_medico");
             //COSOS DEL CONTROLLER JEJEJEJE
-            import { LicenciaController } from '../../../controllers/LicenciaController.js';
+            import { LicenciaController } from '/src/controllers/LicenciaController.js';
 
             const form = document.getElementById("form-licencia");
             const fechainicioInput = document.getElementById("fecha_inicio");
@@ -128,14 +128,14 @@
         </script>
         <script>
             //cargar header
-            fetch('../../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header-container').innerHTML = data;
             })
             .catch(error => console.error('Error al cargar el header:', error));
             //cargar footer
-            fetch('../../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data =>{
                 document.getElementById('footer-container').innerHTML = data;

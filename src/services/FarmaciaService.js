@@ -1,15 +1,24 @@
 // src/services/FarmaciaService.js
+<<<<<<< HEAD
 /*import supabase from '../../supabase/supabaseClient.js';*/
 import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
+=======
+import { getSupabase } from "../../supabase/supabaseClient.js";
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 import { VentaMedicamentoService } from './VentaMedicamentoService.js';
 
 
 export class FarmaciaService {
     static async obtenerRecetas(idFarmacia = null) {
         try {
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             let query = supabase
+=======
+            const sb = await getSupabase();
+            let query = sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
                 .from('receta')
                 .select(`
                     *,
@@ -25,11 +34,11 @@ export class FarmaciaService {
                     )
                 `)
                 .order('fecha_expedicion', { ascending: false });
-            
+                
             //Si hay idFarmacia, obtener la sucursal y filtrar
-if (idFarmacia) {
+    if (idFarmacia) {
     // Obtener la sucursal de la farmacia
-    const { data: farmacia } = await supabase
+    const { data: farmacia } = await sb
         .from('farmacia')
         .select('n_sucursal')
         .eq('id_farmacia', parseInt(idFarmacia))
@@ -37,7 +46,7 @@ if (idFarmacia) {
     
     if (farmacia) {
         // Obtener los códigos de médicos de esta sucursal
-        const { data: medicos } = await supabase
+        const { data: medicos } = await sb
             .from('medico')
             .select('codigo')
             .eq('numero_sucursal', farmacia.n_sucursal);
@@ -46,7 +55,7 @@ if (idFarmacia) {
             const codigosMedicos = medicos.map(m => m.codigo);
             
             // Obtener las citas de esos médicos
-            const { data: citas } = await supabase
+            const { data: citas } = await sb
                 .from('cita')
                 .select('id_cita')
                 .in('codigo_medico', codigosMedicos);
@@ -66,7 +75,7 @@ if (idFarmacia) {
     }
 }
             
-            const { data, error } = await query;
+                    const { data, error } = await query;
             
             if (error) {
                 return { data: null, error };
@@ -81,8 +90,13 @@ if (idFarmacia) {
 
     static async crearVenta(ventaData) {
         try {
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             const { data, error } = await supabase
+=======
+            const sb = await getSupabase();
+            const { data, error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
                 .from('venta')
                 
 .insert({
@@ -107,6 +121,7 @@ if (idFarmacia) {
         }
     }
 
+<<<<<<< HEAD
     static async actualizarVenta(idVenta, ventaData, medicamentosArray = []) {
     try {
       const supabase = await getSupabaseClient();
@@ -141,6 +156,29 @@ if (idFarmacia) {
         if (delRes.error) {
           console.error('Error borrando venta_medicamento:', delRes.error);
           return { data: null, error: delRes.error };
+=======
+    static async actualizarVenta(idVenta, ventaData) {
+        try {
+            const sb = await getSupabase();
+            const { data, error } = await sb
+                .from('venta')
+                .update({
+                    total: ventaData.total,
+                    tipo: ventaData.tipo,
+                    fecha_venta: ventaData.fecha_venta
+                })
+                .eq('id_venta', idVenta)
+                .select()
+                .single();
+            
+            if (error) {
+                return { data: null, error };
+            }
+            
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
         }
 
         if (medicamentosArray.length > 0) {
@@ -171,11 +209,73 @@ if (idFarmacia) {
   }
 
 
+    // Actualiza una venta y reemplaza sus medicamentos en una sola operación
+    static async actualizarVentaConMedicamentos(idVenta, medicamentosArray) {
+        try {
+            const sb = await getSupabase();
+
+            // Calcular total si no viene
+            const total = medicamentosArray && medicamentosArray.length > 0
+                ? medicamentosArray.reduce((s, m) => s + (m.subtotal || 0), 0)
+                : 0;
+
+            // Eliminar medicamentos antiguos asociados a la venta
+            const { error: delError } = await sb
+                .from('venta_medicamento')
+                .delete()
+                .eq('id_venta', idVenta);
+
+            if (delError) {
+                // No abortamos la operación por esto, pero lo registramos
+                console.warn('Error eliminando medicamentos antiguos:', delError);
+            }
+
+            // Actualizar la venta con el nuevo total / fecha
+            const fecha = new Date().toISOString().split('T')[0];
+            const { data: ventaActualizada, error: errUpd } = await sb
+                .from('venta')
+                .update({ total, fecha_venta: fecha })
+                .eq('id_venta', idVenta)
+                .select()
+                .single();
+
+            if (errUpd) {
+                return { data: null, error: errUpd };
+            }
+
+            // Insertar los nuevos medicamentos (si hay)
+            if (medicamentosArray && medicamentosArray.length > 0) {
+                const rows = medicamentosArray.map(m => ({
+                    id_venta: idVenta,
+                    id_medicamento: m.id_medicamento,
+                    cantidad: m.cantidad,
+                    precio_unitario: m.precio,
+                    subtotal: m.subtotal
+                }));
+
+                const { data: inserted, error: insertErr } = await sb
+                    .from('venta_medicamento')
+                    .insert(rows);
+
+                if (insertErr) {
+                    return { data: null, error: insertErr };
+                }
+
+                return { data: { venta: ventaActualizada, venta_medicamento: inserted }, error: null };
+            }
+
+            return { data: { venta: ventaActualizada, venta_medicamento: [] }, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    }
+
     static async eliminarVenta(idVenta) {
         try {
             const supabase = await getSupabaseClient();
             // Primero eliminar los medicamentos asociados en venta_medicamento
-            const { error: errorMedicamentos } = await supabase
+            const sb = await getSupabase();
+            const { error: errorMedicamentos } = await sb
                 .from('venta_medicamento')
                 .delete()
                 .eq('id_venta', idVenta);
@@ -186,7 +286,7 @@ if (idFarmacia) {
             }
             
             // Luego eliminar la venta
-            const { error } = await supabase
+            const { error } = await sb
                 .from('venta')
                 .delete()
                 .eq('id_venta', idVenta);
@@ -202,8 +302,13 @@ if (idFarmacia) {
     }
     static async obtenerVentas(idFarmacia = null) {
         try {
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             let query = supabase
+=======
+            const sb = await getSupabase();
+            let query = sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('venta')
             .select(`
                 *,
@@ -248,9 +353,15 @@ if (idFarmacia) {
 static async obtenerMedicamentosdeRecetas(idReceta){
 	//metodo para obtener medicamentos asociados a una receta
 	try{
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
 		const {data,error} = await supabase
 		.from('receta_medicamento')
+=======
+        const sb = await getSupabase();
+        const {data,error} = await sb
+        .from('receta_medicamento')
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 		.select(`
                 id_medicamento,
                 cantidad,
@@ -288,8 +399,13 @@ static async obtenerMedicamentosdeRecetas(idReceta){
 
 static async surtirReceta(idReceta) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const { data, error } = await supabase
+=======
+        const sb = await getSupabase();
+        const { data, error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('receta')
             .select('*')
             .eq('id_receta', idReceta)
@@ -429,8 +545,13 @@ static async surtirReceta(idReceta) {
 }
 static async marcarRecetaComoSurtida(idReceta) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const { error } = await supabase
+=======
+        const sb = await getSupabase();
+        const { error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('receta')
             .update({ surtida: true })
             .eq('id_receta', idReceta);

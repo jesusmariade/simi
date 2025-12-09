@@ -108,6 +108,7 @@ export class SucursalController {
         console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
         
         window.location.href = 'bienvenido.html';
+<<<<<<< HEAD
     }
 
     static async inicializar() {
@@ -199,6 +200,8 @@ export class SucursalController {
         
         console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
         window.location.href = 'bienvenido.html';
+=======
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
     }
 
     static async inicializar() {

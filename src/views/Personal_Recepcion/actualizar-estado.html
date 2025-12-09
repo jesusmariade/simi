@@ -48,9 +48,14 @@
     <script type="module">
         import {PacienteController} from '/src/controllers/PacienteController.js';
         
+<<<<<<< HEAD
        // window.addEventListener('DOMContentLoaded', async () => {
         (async function () {
             const curp = localStorage.getItem('curp_paciente');
+=======
+        window.addEventListener('DOMContentLoaded', async () => {
+            const curp = localStorage.getItem('curp');
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             const titulo = document.getElementById('titulo')
             if(!curp){
             console.error('no se encontro curp',error);

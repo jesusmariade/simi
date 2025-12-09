@@ -1,7 +1,11 @@
 //src/services/CitaService.js
 
+<<<<<<< HEAD
 /*import supabase from '../../supabase/supabaseClient.js';*/
 import { getSupabaseClient } from '../../supabase/supabaseClient.js';
+=======
+import { getSupabase } from '../../supabase/supabaseClient.js';
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 
 export class CitaService{//funciones
     //obtener citas por paciente 
@@ -27,8 +31,13 @@ export class CitaService{//funciones
 
    static async obtenerCitasporPaciente(curp_paciente, numero_sucursal) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const {data, error} = await supabase
+=======
+        const sb = await getSupabase();
+        const {data, error} = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('cita')
             .select(`
                 *,
@@ -51,9 +60,15 @@ export class CitaService{//funciones
     //obtenere citas por medico
     static async obtenerCitasporMedico(codigo_medico){
         try{
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             const {data, error} = await supabase
             .from ('cita')
+=======
+            const sb = await getSupabase();
+            const {data, error} = await sb
+                .from ('cita')
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .select ('*')
             .eq('codigo_medico', codigo_medico)
             .order('fecha')//se organizen por fecha de la mas cercana a la actual espero
@@ -69,8 +84,13 @@ export class CitaService{//funciones
     //crear cita
     static async crearCita(citaData){
         try{
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             const {data,error} = await supabase
+=======
+            const sb = await getSupabase();
+            const {data,error} = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from ('cita')
             .insert({
                 curp_paciente: citaData.curp_paciente,
@@ -94,8 +114,13 @@ export class CitaService{//funciones
     //funcion de obtener cita por id_cita(esta es para que funcione actualizar cita)
   static async obtenerCitaPorId(id_cita) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const { data, error } = await supabase
+=======
+        const sb = await getSupabase();
+        const { data, error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from("cita")
             .select("*")
             .eq("id_cita", id_cita)
@@ -110,8 +135,13 @@ export class CitaService{//funciones
     //funcion para editar cita
     static async actualizarCita(citaData,id_cita){
         try{
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             const {data,error} = await supabase
+=======
+            const sb = await getSupabase();
+            const {data,error} = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('cita')
             .update({
                 curp_paciente: citaData.curp_paciente,
@@ -136,8 +166,13 @@ export class CitaService{//funciones
     //funcion para eliminar  si tienen dudas me dicen jeje ya me voy (oka xdxdxd - ATTE: yo)(oki att.alo)
     static async eliminarcita(id_cita){
         try{
+<<<<<<< HEAD
             const supabase = await getSupabaseClient();
             const {data,error} = await supabase
+=======
+            const sb = await getSupabase();
+            const {data,error} = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('cita')
             .delete()
             .eq('id_cita', id_cita);
@@ -154,8 +189,13 @@ export class CitaService{//funciones
     //funcion para cancelar cita
     static async cancelarCita(id_cita) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const { data, error } = await supabase
+=======
+        const sb = await getSupabase();
+        const { data, error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('cita')
             .update({ cancelada: true })
             .eq('id_cita', id_cita)
@@ -171,8 +211,13 @@ export class CitaService{//funciones
     //funcion para reactivar cita
     static async reactivarCita(id_cita) {
     try {
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const { data, error } = await supabase
+=======
+        const sb = await getSupabase();
+        const { data, error } = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
             .from('cita')
             .update({ cancelada: false })
             .eq('id_cita', id_cita)

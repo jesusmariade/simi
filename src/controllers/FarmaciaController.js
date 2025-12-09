@@ -270,6 +270,7 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
     }
 }
 
+<<<<<<< HEAD
     static async actualizarVenta(idVenta, ventaData, medicamentosArray = []) {
     try {
       const { data, error } = await FarmaciaService.actualizarVenta(idVenta, ventaData, medicamentosArray);
@@ -277,6 +278,42 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
     } catch (error) {
       console.error('Error en FarmaciaController.actualizarVenta:', error);
       return { venta: null, error };
+=======
+    static async actualizarVentaConMedicamentos(idVenta, medicamentosArray) {
+        try {
+            const { data, error } = await FarmaciaService.actualizarVentaConMedicamentos(idVenta, medicamentosArray);
+            if (error) {
+                console.error('Error al actualizar venta con medicamentos:', error);
+                return { venta: null, error };
+            }
+            return { venta: data, error: null };
+        } catch (error) {
+            console.error('Error:', error);
+            return { venta: null, error };
+        }
+    }
+
+    static async actualizarVenta(idVenta, ventaData) {
+        try {
+            const venta = {
+                total: parseFloat(ventaData.total),
+                tipo: 'venta',
+                fecha_venta: new Date().toISOString().split('T')[0]
+            };
+            
+            const { data, error } = await FarmaciaService.actualizarVenta(idVenta, venta);
+            
+            if (error) {
+                console.error('Error al actualizar venta:', error);
+                return { venta: null, error };
+            }
+            
+            return { venta: data, error: null };
+        } catch (error) {
+            console.error('Error:', error);
+            return { venta: null, error };
+        }
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
     }
   }
     static async eliminarVenta(idVenta) {

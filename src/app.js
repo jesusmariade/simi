@@ -5,8 +5,19 @@ import path from "path";
 import os from "os";
 import farmaciaRoutes from "./routes/farmaciaRoutes.js";
 import sucursalRoutes from "./routes/sucursalRoutes.js";
+import medicoRoutes from "./routes/medicoRoutes.js";
+import pacienteRoutes from "./routes/pacienteRoutes.js";
+import citaRoutes from "./routes/citaRoutes.js";
+import licenciaRoutes from "./routes/LicenciaRoutes.js";
 
 const app = express();
+
+//alo puso
+// Permitir servir header.html, footer.html, index.html (desde la raíz del proyecto)
+app.use(express.static(process.cwd()));
+
+//yo puse
+app.use("/src", express.static(path.join(process.cwd(), "src")));
 
 // Middleware
 app.use(express.json());
@@ -29,6 +40,10 @@ app.use("/views", express.static(path.join(process.cwd(), "src", "views")));
 // Rutas
 app.use("/farmacia", farmaciaRoutes);
 app.use("/sucursales", sucursalRoutes);
+app.use("/medico", medicoRoutes);
+app.use("/pacientes", pacienteRoutes);
+app.use("/citas", citaRoutes);
+app.use("/licencias", licenciaRoutes);
 
 app.get("/", (req, res) => {
 	// redirige al archivo mostrado en tu proyecto
@@ -60,9 +75,9 @@ function startServer(port, attempt = 0, maxAttempts = 10) {
 			}
 			if (localIp !== "localhost") break;
 		}
-		console.log(`Servidor corriendo en:`);
-		console.log(`- Local: http://localhost:${port}`);
-		console.log(`- LAN   : http://${localIp}:${port}  (comparte esto si tu firewall lo permite)`);
+		console.log('Servidor corriendo en:');
+		console.log('- Local: http://localhost:' + port);
+		console.log('- LAN   : http://' + localIp + ':' + port + '  (comparte esto si tu firewall lo permite)');
 	});
 
 	server.on("error", (err) => {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules          # No copiar node_modules (se instala de nuevo)
 npm-debug.log        # No copiar logs
 .git                 # No copiar la carpeta .git (no se necesita)
@@ -8,3 +9,15 @@ npm-debug.log        # No copiar logs
 LICENSE              # No copiar LICENSE
 CONTRIBUTING.md      # No copiar este archivo
 public/ArcInstaller.exe  # No copiar el .exe que encontramos
+=======
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.DS_Store
+*.md
+LICENSE
+CONTRIBUTING.md
+public/ArcInstaller.exe
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06

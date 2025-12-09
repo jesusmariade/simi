@@ -1,47 +1,65 @@
-/*// supabase/supabaseClient.js
-import { createClient } from '@supabase/supabase-js';
 import SUPABASE_CONFIG from './config.js';
 
-const supabase = createClient(
-  SUPABASE_CONFIG.url, 
-  SUPABASE_CONFIG.anonKey
-);
+// Detectar si es navegador o Node.js
+const isNodeEnvironment = typeof window === 'undefined';
 
-/*export default supabase;*/
-/*let supabase;
+let supabase = null;
+let initPromise = null;
 
-if (typeof window === "undefined") {
-  // Ejecutado en Node
-  supabase = (await import("./supabaseClient.node.js")).supabase;
-} else {
-  // Ejecutado en navegador
-  supabase = (await import("./supabaseClient.browser.js")).default;
-}
+async function initializeSupabase() {
+  if (supabase) return supabase;
 
-export default supabase;*/
-let cachedClient = null;
-
-export async function getSupabaseClient() {
-  if (cachedClient) return cachedClient;
-
-  if (typeof window === "undefined") {
-    // Node.js (servidor)
-    const mod = await import("./supabaseClient.node.js");
-    cachedClient = mod.default(); // getSupabaseClientNode es la función por defecto
-    return cachedClient;
-  } else {
-    // Navegador
-    const mod = await import("./supabaseClient.browser.js");
-    cachedClient = await mod.getSupabaseClientBrowser();
-    return cachedClient;
+  try {
+    if (isNodeEnvironment) {
+      // Node.js: usar import de npm
+      const { createClient } = await import('@supabase/supabase-js');
+      supabase = createClient(
+        SUPABASE_CONFIG.url, 
+        SUPABASE_CONFIG.anonKey
+      );
+    } else {
+      // Navegador: usar CDN
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      supabase = createClient(
+        SUPABASE_CONFIG.url, 
+        SUPABASE_CONFIG.anonKey
+      );
+    }
+  } catch (error) {
+    console.error('Error initializing Supabase:', error);
   }
+
+  return supabase;
 }
 
-export default getSupabaseClient;
+// Inicializar inmediatamente si es Node.js (sincrónico)
+if (isNodeEnvironment) {
+  await initializeSupabase();
+}
 
+// Crear un proxy que espere a la inicialización en navegador
+const handler = {
+  get: (target, prop) => {
+    if (supabase && supabase[prop]) {
+      return supabase[prop];
+    }
+    // Devolver una función que espere la inicialización
+    return async function (...args) {
+      const client = await initializeSupabase();
+      if (client && client[prop]) {
+        return client[prop](...args);
+      }
+      throw new Error(`Supabase property ${String(prop)} not found`);
+    };
+  }
+};
 
+async function getSupabase() {
+  if (supabase) return supabase;
+  await initializeSupabase();
+  return supabase;
+}
 
+export { getSupabase };
 
-
-
-
+export default supabase || new Proxy({}, handler);

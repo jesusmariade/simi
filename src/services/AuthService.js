@@ -2,8 +2,14 @@
 va a verificar las contraseñas busca el usuario 
  retorna si es valido 
  y correspondiente a el tipo de usuario a y crear un nuevo usuario tambien */ 
+<<<<<<< HEAD
 /* se cambio import supabase from por {getSupabaseClient}*/
 import { getSupabaseClient } from '../../supabase/supabaseClient.js';
+=======
+
+import { getSupabase } from "../../supabase/supabaseClient.js";
+
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 import { Usuario } from "../models/Usuario.js";
 
 export class AuthService {
@@ -69,7 +75,8 @@ static async iniciarSesion(email, password){
     console.log('Intentando iniciar sesión con email:', email);
     
     //buscarel usuario por email 
-    const {data: UsuarioData, error} = await supabase
+    const sb = await getSupabase();
+    const {data: UsuarioData, error} = await sb
     .from("usuarios")
     .select("*")
     .eq("email", email)
@@ -106,8 +113,13 @@ if (!passwordValido){
 //OBTENEMOS EL USUARIO POR EL id        
 static async obtenerUsuarioPorId(id){
     try{
+<<<<<<< HEAD
         const supabase = await getSupabaseClient();
         const {data: UsuarioData, error} = await supabase
+=======
+        const sb = await getSupabase();
+        const {data: UsuarioData, error} = await sb
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
     .from("usuarios")
     .select("*")
     .eq("id", id)
@@ -159,7 +171,8 @@ static async crearUsuario(usuarioData){
 
         const passwordHash = bcryptLib.hashSync(usuarioData.password, 10);
 
-        const {data, error} = await supabase 
+        const sb = await getSupabase();
+        const {data, error} = await sb 
             .from('usuarios')
             .insert({
                 email: usuarioData.email,

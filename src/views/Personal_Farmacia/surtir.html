@@ -92,14 +92,14 @@
 <script>
         // Cargar header y footer
 	    //cargar header
-        fetch('../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
@@ -109,9 +109,9 @@
 <script type="module">
     //esto si se ocupa
         //controller para farmacia
-        import { FarmaciaController} from '../../controllers/FarmaciaController.js';
-        import { RecetaController } from '../../controllers/RecetaController.js';
-        import { RecetaMedicamentoController } from '../../controllers/RecetaMedicamentoController.js';
+        import { FarmaciaController} from '/src/controllers/FarmaciaController.js';
+        import { RecetaController } from '/src/controllers/RecetaController.js';
+        import { RecetaMedicamentoController } from '/src/controllers/RecetaMedicamentoController.js';
 
         //variable global
         let carrito = []; // { id_receta_medicamento, nombre, cantidad, precio }

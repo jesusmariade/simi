@@ -1,6 +1,10 @@
 // src/services/SucursalService.js
 // Cliente de Supabase que funciona en navegador y Node.js
+<<<<<<< HEAD
 /*let supabaseClient = null;
+=======
+let supabaseClient = null;
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 
 async function getSupabaseClient() {
     if (supabaseClient) return supabaseClient;
@@ -69,6 +73,7 @@ export class SucursalService {
         
         return { data, error: null };
     }
+<<<<<<< HEAD
 }*/
 /*import { getSupabaseClient } from '../../supabase/supabaseClient.js';
 
@@ -153,4 +158,6 @@ export class SucursalService {
             return { data: null, error: err };
         }
     }
+=======
+>>>>>>> 7e50ab2d024fdc0d096947f9c7091498c8e1de06
 }
