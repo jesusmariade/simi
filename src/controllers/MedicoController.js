@@ -5,7 +5,7 @@ export class MedicoController{
     static async CargarMedicos(){
         try{
         const numero_sucursal = localStorage.getItem("sucursalId");
-        const { data,error} = await MedicoService.obtenerMedicos(numero_sucursal);
+        const {data,error} = await MedicoService.obtenerMedicos(numero_sucursal);
         if(error){
             console.error('Error al cargar medicos', error);
             return {medicos: [], error};

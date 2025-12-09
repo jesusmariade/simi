@@ -1,0 +1,38 @@
+version: '3.8'
+# Versión del formato de docker-compose
+
+services:
+  # Un "servicio" es tu aplicación corriendo en un contenedor
+  simi-app:
+    # Nombre del servicio (puedes ponerle el que quieras)
+    
+    build: .
+    # Explicación: Construye la imagen usando el Dockerfile de esta carpeta (.)
+    # Equivale a: docker build .
+    
+    container_name: simi-app
+    # Explicación: Nombre del contenedor cuando esté corriendo
+    # Útil para identificarlo fácilmente con "docker ps"
+    
+    ports:
+      - "3000:3000"
+    # Explicación: Mapeo de puertos
+    # Formato: "PUERTO_EXTERNO:PUERTO_INTERNO"
+    # - Puerto 3000 del servidor -> Puerto 3000 del contenedor
+    # Esto permite que desde fuera del contenedor puedas acceder a tu app
+    
+    environment:
+      # Variables de entorno que tu app usará
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - SUPABASE_URL=https://augycbgsquurallcmzir.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1Z3ljYmdzcXV1cmFsbGNtemlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NjIzMzYsImV4cCI6MjA3ODUzODMzNn0.yNce0WIZiV3HWUUTxLxWSDSTVao-yTwCuoIbSjZc3a4
+    # Explicación: Estas variables están disponibles en process.env dentro de tu app
+    # Tu app.js las lee: process.env.PORT, process.env.SUPABASE_URL, etc.
+    
+    restart: unless-stopped
+    # Explicación: Reinicia automáticamente el contenedor si:
+    # - Se cae por error (crashea)
+    # - El servidor se reinicia
+    # "unless-stopped" = reinicia siempre, a menos que lo detengas manualmente

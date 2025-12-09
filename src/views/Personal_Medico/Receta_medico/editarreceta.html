@@ -57,7 +57,7 @@
     <div id="footer-container"></div>
 
 <script type="module">
-import { RecetaController } from '../../../controllers/RecetaController.js';
+import { RecetaController } from '/src/controllers/RecetaController.js';
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -300,12 +300,12 @@ document.getElementById('formReceta').addEventListener('submit', async (e) => {
 });
 
 // Header
-fetch('../../../../header.html')
+fetch('/header.html')
     .then(res => res.text())
     .then(data => document.getElementById('header-container').innerHTML = data);
 
 // Footer
-fetch('../../../../footer.html')
+fetch('/footer.html')
     .then(res => res.text())
     .then(data => document.getElementById('footer-container').innerHTML = data);
 

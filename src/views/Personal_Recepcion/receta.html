@@ -61,14 +61,14 @@
     <div id="footer-container"></div>
     <script>
         //cargar header
-            fetch('../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header-container').innerHTML = data;
             })
             .catch(error => console.error('Error al cargar el header:', error));
             //cargar footer
-            fetch('../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
@@ -76,7 +76,7 @@
             .catch(error => console.error('Error al cargar el footer:', error));
     </script>
     <!-- <script type="module">
-        import {RecetaController} from '../../../controllers/RecetaController.js';
+        import {RecetaController} from '/src/controllers/RecetaController.js';
         //vamos por partes de la tablita, primero empezaremos por receta
         //cargar receta
         document.addEventListener("DOMContentLoaded",cargarRecetas);
@@ -133,7 +133,7 @@
         }
     </script>
    <script type="module">
-        import {RecetaMedicamentoController} from '../../../controllers/RecetaMedicamentoController.js';
+        import {RecetaMedicamentoController} from '/src/controllers/RecetaMedicamentoController.js';
         //cargar receta medicamento
        /* document.addEventListener("DOMContentLoaded",cargarRecetasMedicamento);*/
 
@@ -178,8 +178,8 @@
         }
     </script>-->
 <script type="module">
-import { RecetaController } from '../../controllers/RecetaController.js';
-import { RecetaMedicamentoController } from '../../controllers/RecetaMedicamentoController.js';
+import { RecetaController } from '/src/controllers/RecetaController.js';
+import { RecetaMedicamentoController } from '/src/controllers/RecetaMedicamentoController.js';
 
 document.addEventListener("DOMContentLoaded", cargarPagina);
 
@@ -247,15 +247,7 @@ async function cargarMedicamentos(id_receta) {
     });
 }
 
-// Header
-fetch('../../../../header.html')
-    .then(res => res.text())
-    .then(data => document.getElementById('header-container').innerHTML = data);
-
-// Footer
-fetch('../../../../footer.html')
-    .then(res => res.text())
-    .then(data => document.getElementById('footer-container').innerHTML = data);
+// Header y Footer ya se cargan arriba con rutas absolutas
 
 </script>
 </body>

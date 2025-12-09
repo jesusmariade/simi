@@ -71,7 +71,7 @@
         <div id="footer-container"></div>
         <!--script para que funcione agregar medico, un padre nuestro y jala-->
         <script type="module">
-            import { MedicoController } from '../../controllers/MedicoController.js';
+            import { MedicoController } from '/src/controllers/MedicoController.js';
 
             const form = document.getElementById("form-medico");
 
@@ -101,14 +101,14 @@
         
         <script>
         //cargar header
-        fetch('../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

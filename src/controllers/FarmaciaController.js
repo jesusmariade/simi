@@ -269,6 +269,20 @@ static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUn
     }
 }
 
+    static async actualizarVentaConMedicamentos(idVenta, medicamentosArray) {
+        try {
+            const { data, error } = await FarmaciaService.actualizarVentaConMedicamentos(idVenta, medicamentosArray);
+            if (error) {
+                console.error('Error al actualizar venta con medicamentos:', error);
+                return { venta: null, error };
+            }
+            return { venta: data, error: null };
+        } catch (error) {
+            console.error('Error:', error);
+            return { venta: null, error };
+        }
+    }
+
     static async actualizarVenta(idVenta, ventaData) {
         try {
             const venta = {

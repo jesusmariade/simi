@@ -65,7 +65,7 @@
     <div id="footer-container"></div>
    
     <script type="module">
-        import { AuthService } from '../../services/AuthService.js';
+        import { AuthService } from '/src/services/AuthService.js';
         
         const formRegistro = document.getElementById('formregistro');
         const errorMessage = document.getElementById('error-message');
@@ -121,12 +121,12 @@
     </script>
     <script>
         // Header
-        fetch('../../../../header.html')
+        fetch('/header.html')
             .then(res => res.text())
             .then(data => document.getElementById('header-container').innerHTML = data);
 
         // Footer
-        fetch('../../../../footer.html')
+        fetch('/footer.html')
             .then(res => res.text())
             .then(data => document.getElementById('footer-container').innerHTML = data);
 

@@ -118,7 +118,7 @@
     <!--footer-->
     <div id="footer-container"></div>
     <script type="module">
-        import { CitaController } from "../../controllers/CitaController.js";
+        import { CitaController } from "/src/controllers/CitaController.js";
 
 window.addEventListener('DOMContentLoaded', () => {
     const nombre_completo = localStorage.getItem('nombre_completo');
@@ -284,14 +284,14 @@ document.getElementById("btn-agregar-cita").addEventListener("click", () => {
     </script>
     <script>
         //cargar header
-        fetch('../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

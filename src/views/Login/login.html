@@ -55,7 +55,7 @@
     });
 </script>
 <script type="module">
-    import {AuthController } from '../../controllers/AuthController.js';
+    import {AuthController } from '/src/controllers/AuthController.js';
 
     const formlogin = document.getElementById('formlogin');
     const errorMessage = document.getElementById('error-message');
@@ -113,19 +113,35 @@
 </script>
 <script>
             //cargar header
-            fetch('../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header-container').innerHTML = data;
             })
-            .catch(error => console.error('Error al cargar el header:', error));
+            .catch(error => {
+                console.error('Error al cargar el header:', error);
+                fetch('../../../header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-container').innerHTML = data;
+                })
+                .catch(err => console.error('Error en fallback header:', err));
+            });
             //cargar footer
-            fetch('../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
             })
-            .catch(error => console.error('Error al cargar el footer:', error));
+            .catch(error => {
+                console.error('Error al cargar el footer:', error);
+                fetch('../../../footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-container').innerHTML = data;
+                })
+                .catch(err => console.error('Error en fallback footer:', err));
+            });
             //para que diga el nombre de la sucursal
             window.addEventListener('DOMContentLoaded', () => {
             const sucursalNombre = localStorage.getItem('sucursalNombre') || 'Sucursal';
@@ -137,5 +153,3 @@
         </script>
     </body>
 </html>
-
-    

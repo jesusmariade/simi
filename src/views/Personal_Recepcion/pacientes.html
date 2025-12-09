@@ -45,8 +45,8 @@
         <div id="footer-container"></div>
         <script type="module">
             //importo controlador
-            import {PacienteController} from '../../controllers/pacienteController.js';
-            import { AuthController } from '../../controllers/AuthController.js';
+            import {PacienteController} from '/src/controllers/PacienteController.js';
+            import { AuthController } from '/src/controllers/AuthController.js';
 
             if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('recepcionista')) {
                 window.location.href = '../Login/login.html';

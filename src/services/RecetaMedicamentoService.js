@@ -1,12 +1,13 @@
 // src/services/RecetaMedicamentoService.js
-import supabase from '../../supabase/supabaseClient.js';
+import { getSupabase } from '../../supabase/supabaseClient.js';
 
 export class RecetaMedicamentoService {
 
     // OBTENER medicamentos de una receta
     static async obtenerRecetaMedicamentoporid(id_receta) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('receta_medicamento')
                 .select(`
                     id_receta,
@@ -33,7 +34,8 @@ export class RecetaMedicamentoService {
     // CREAR medicamento en receta
     static async crearRecetaMedicamento(info) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('receta_medicamento')
                 .insert(info)
                 .select()
@@ -50,7 +52,8 @@ export class RecetaMedicamentoService {
     // ACTUALIZAR medicamento
     static async actualizarRecetaMedicamento(id_receta, info) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('receta_medicamento')
                 .update(info)
                 .eq('id_receta', id_receta)
@@ -67,7 +70,8 @@ export class RecetaMedicamentoService {
     // BORRAR medicamento
     static async eliminarRecetaMedicamento(id_receta) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('receta_medicamento')
                 .delete()
                 .eq('id_receta', id_receta);
@@ -82,7 +86,8 @@ export class RecetaMedicamentoService {
     //funcion para obtener medicamentos de una receta (para farmacia controller)
     static async obtenerMedicamentosDeReceta(idReceta){
         try{
-            const {data,error} = await supabase
+            const sb = await getSupabase();
+            const {data,error} = await sb
             .from ('receta_medicamento')
             .select(`
                 *,
@@ -105,7 +110,8 @@ export class RecetaMedicamentoService {
     // Marca un registro receta_medicamento como comprado (true)
     static async marcarComoComprado(id_receta, id_medicamento) {
     try {
-        const { data, error } = await supabase
+        const sb = await getSupabase();
+        const { data, error } = await sb
             .from('receta_medicamento')
             .update({ comprado: true })
             .eq('id_receta', id_receta)

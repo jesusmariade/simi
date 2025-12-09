@@ -39,7 +39,7 @@
     <div id="footer-container"></div>
 
 <script type="module">
-import { LicenciaController } from '../../../controllers/LicenciaController.js';
+import { LicenciaController } from '/src/controllers/LicenciaController.js';
 
 window.addEventListener("DOMContentLoaded", async () => {
 
@@ -136,14 +136,14 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     <script>
         //cargar header
-        fetch('../../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data =>{
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('No se pudo cargar el header', error));
         //cargar footer
-        fetch('../../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

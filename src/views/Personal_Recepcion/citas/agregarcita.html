@@ -286,9 +286,9 @@
 </script>
 
    <script type="module">
-        import { MedicoController } from "../../../controllers/MedicoController.js";
-        import {CitaController} from "../../../controllers/CitaController.js";
-        import {LicenciaController} from "../../../controllers/LicenciaController.js";
+        import { MedicoController } from "/src/controllers/MedicoController.js";
+        import {CitaController} from "/src/controllers/CitaController.js";
+        import {LicenciaController} from "/src/controllers/LicenciaController.js";
 
         //los globalizo
         window.CitaController = CitaController;
@@ -503,14 +503,14 @@
 
         <script>
         //cargar header
-            fetch('../../../../header.html')
+            fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                     document.getElementById('header-container').innerHTML = data;
             })
             .catch(error => console.error('Error al cargar el header', error));
             //cargar footer
-            fetch('../../../../footer.html')
+            fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;

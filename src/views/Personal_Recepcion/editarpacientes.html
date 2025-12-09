@@ -60,7 +60,7 @@
         <div id="footer-container"></div>
         <script type="module">
         //codigo para que guarde y en enseñe datos
-        import { PacienteController } from '../../controllers/PacienteController.js';
+        import { PacienteController } from '/src/controllers/PacienteController.js';
         
         //cargar codigo de medico que pasamos desde medicos
          window.addEventListener('DOMContentLoaded', async () => {
@@ -126,14 +126,14 @@
         </script>
         <script>
         //cargar header
-        fetch('/../../../header.html')
+        fetch('/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
         })
         .catch(error => console.error('Error al cargar el header', error));
         //cargar footer
-        fetch('/../../../footer.html')
+        fetch('/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;

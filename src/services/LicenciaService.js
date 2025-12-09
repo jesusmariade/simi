@@ -1,5 +1,5 @@
 //src/services/LicenciaService.js
-import supabase from '../../supabase/supabaseClient.js';
+import { getSupabase } from '../../supabase/supabaseClient.js';
 
 export class LicenciaService {
 
@@ -12,7 +12,8 @@ export class LicenciaService {
             const diffMs = fin - inicio;
             const duracionDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))+1;
 
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('licencia')
                 .insert({
                     codigo_medico: parseInt(codigoMedico),
@@ -33,7 +34,8 @@ export class LicenciaService {
     //obtener licencias por medico
     static async ObtenerLicenciaPorMedico(codigo_medico){
         try{
-            const {data,error} = await supabase
+            const sb = await getSupabase();
+            const {data,error} = await sb
             .from('licencia')
             .select('*')
             .eq('codigo_medico',codigo_medico)
@@ -49,7 +51,8 @@ export class LicenciaService {
     // Obtener todas las licencias
     static async obtenerLicencias() {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('licencia')
                 .select('*')
                 .order('id_licencia', { ascending: true });
@@ -65,7 +68,8 @@ export class LicenciaService {
     // Obtener una licencia por ID
     static async obtenerLicenciaPorId(idLicencia) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('licencia')
                 .select('*')
                 .eq('id_licencia', parseInt(idLicencia))
@@ -90,7 +94,8 @@ export class LicenciaService {
                 datos.duracion_dias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))+1;
             }
 
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('licencia')
                 .update(datos)
                 .eq('id_licencia', parseInt(idLicencia))
@@ -108,7 +113,8 @@ export class LicenciaService {
     // Eliminar una licencia
     static async eliminarLicencia(idLicencia) {
         try {
-            const { error } = await supabase
+            const sb = await getSupabase();
+            const { error } = await sb
                 .from('licencia')
                 .delete()
                 .eq('id_licencia', parseInt(idLicencia));

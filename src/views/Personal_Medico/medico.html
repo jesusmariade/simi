@@ -66,8 +66,8 @@
         <script type="module">
             //dios bendiceme con el script para que funcione
             //importar controlador
-            import { MedicoController} from '../../controllers/MedicoController.js';
-            import { AuthController } from '../../controllers/AuthController.js';
+            import { MedicoController} from '/src/controllers/MedicoController.js';
+            import { AuthController } from '/src/controllers/AuthController.js';
 
             if (!AuthController.verificarSesion() || !AuthController.verificarTipoUsuario('medico')) {
                 window.location.href = '../Login/login.html';

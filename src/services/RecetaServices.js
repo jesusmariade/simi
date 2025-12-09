@@ -1,10 +1,11 @@
 // src/services/RecetaService.js
-import supabase from '../../supabase/supabaseClient.js';
+import { getSupabase } from '../../supabase/supabaseClient.js';
 export class RecetaService {
     // Crear una nueva receta asociada a una cita ahora vamos a crear el controlador y nuestro modelo 
     static async crearReceta(idCita) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('receta')
                 .insert({
                     id_cita: parseInt(idCita),
@@ -25,8 +26,9 @@ export class RecetaService {
     }
     // Agregar un medicamento a una receta noooooo guardaaa las recetaaas aaaaaaaaaaaa
 static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis, comprado) {
-    try {
-        const { data, error } = await supabase
+        try {
+        const sb = await getSupabase();
+        const { data, error } = await sb
             .from('receta_medicamento')
             .insert({
                 id_receta: idReceta,
@@ -50,7 +52,8 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
 //parte para obtener receta a traves de la id de la cita
     static async obtenerRecetaporId(id_cita){
         try{
-            const {data,error} = await supabase
+            const sb = await getSupabase();
+            const {data,error} = await sb
             .from('receta')
             .select('*')
             .eq('id_cita',id_cita)
@@ -65,7 +68,8 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
     }
 //funcion para surtir receta con el boton
     static async SurtirReceta(id_receta){
-        const { data, error } = await supabase
+        const sb = await getSupabase();
+        const { data, error } = await sb
             .from('receta')
             .update({ surtida: true })
             .eq('id_receta', id_receta)
@@ -78,7 +82,8 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
     //para editar
    static async obtenerRecetaporCita(id_cita) {
     try {
-        const { data: receta, error } = await supabase
+        const sb = await getSupabase();
+        const { data: receta, error } = await sb
             .from('receta')
             .select(`
                 id_receta,
@@ -107,7 +112,8 @@ static async agregarMedicamentoAReceta(idReceta, idMedicamento, cantidad, dosis,
 // Actualizar medicamento en la receta usando la PK compuesta
 static async actualizarMedicamentoReceta(idReceta, idMedicamentoOld, idMedicamentoNew, cantidad, dosis) {
     try {
-        const { data, error } = await supabase
+        const sb = await getSupabase();
+        const { data, error } = await sb
             .from('receta_medicamento')
             .update({
                 id_medicamento: idMedicamentoNew,
@@ -131,7 +137,8 @@ static async actualizarMedicamentoReceta(idReceta, idMedicamentoOld, idMedicamen
 // Eliminar medicamento de receta (llave compuesta)
 static async eliminarMedicamentoReceta(id_receta, id_medicamento) {
     try {
-        const { error } = await supabase
+        const sb = await getSupabase();
+        const { error } = await sb
             .from('receta_medicamento')
             .delete()
             .eq('id_receta', id_receta)

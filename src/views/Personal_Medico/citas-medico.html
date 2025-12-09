@@ -96,8 +96,8 @@
 
     <!-- SCRIPT: Citas -->
     <script type="module">
-        import { CitaController } from "../../controllers/CitaController.js";
-        import { RecetaController } from "../../controllers/RecetaController.js";
+        import { CitaController } from "/src/controllers/CitaController.js";
+        import { RecetaController } from "/src/controllers/RecetaController.js";
 
         document.addEventListener("DOMContentLoaded", cargarCitas);
 
@@ -237,7 +237,7 @@
 
     <!-- Script licencias -->
     <script type="module">
-        import { LicenciaController } from '../../controllers/LicenciaController.js';
+        import { LicenciaController } from '/src/controllers/LicenciaController.js';
 
         document.addEventListener("DOMContentLoaded", cargarLicencias);
 
@@ -302,11 +302,11 @@
     </script>
 
     <script>
-        fetch('../../../header.html')
+        fetch('/header.html')
             .then(res => res.text())
             .then(data => document.getElementById('header-container').innerHTML = data);
 
-        fetch('../../../footer.html')
+        fetch('/footer.html')
             .then(res => res.text())
             .then(data => document.getElementById('footer-container').innerHTML = data);
     </script>

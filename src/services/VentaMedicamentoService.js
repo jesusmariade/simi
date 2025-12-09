@@ -1,10 +1,11 @@
 // src/services/VentaMedicamentoService.js
-import supabase from '../../supabase/supabaseClient.js';
+import { getSupabase } from '../../supabase/supabaseClient.js';
 
 export class VentaMedicamentoService {
     static async agregarMedicamentoAVenta(idVenta, idMedicamento, cantidad, precioUnitario, subtotal) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('venta_medicamento')
                 .insert({
                     id_venta: idVenta,
@@ -28,7 +29,8 @@ export class VentaMedicamentoService {
     
     static async obtenerMedicamentosDeVenta(idVenta) {
         try {
-            const { data, error } = await supabase
+            const sb = await getSupabase();
+            const { data, error } = await sb
                 .from('venta_medicamento')
                 .select(`
                     *,

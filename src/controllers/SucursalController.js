@@ -1,7 +1,45 @@
 // src/controllers/SucursalController.js
 import { SucursalService } from '../services/SucursalService.js';
-import supabase from '../../supabase/supabaseClient.js';
 import { Sucursal } from '../models/Sucursal.js';
+
+// Cliente de Supabase que funciona en navegador y Node.js
+let supabaseClient = null;
+
+async function getSupabaseClient() {
+    if (supabaseClient) return supabaseClient;
+    
+    const isBrowser = typeof window !== 'undefined';
+    
+    if (isBrowser) {
+        // Esperar a que Supabase se cargue si aún no está disponible
+        if (!window.supabase && window.supabaseLoaded !== true) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        if (window.supabase) {
+            supabaseClient = window.supabase;
+            return supabaseClient;
+        }
+        
+        try {
+            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+            supabaseClient = createClient(
+                'https://augycbgsquurallcmzir.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1Z3ljYmdzcXV1cmFsbGNtemlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NjIzMzYsImV4cCI6MjA3ODUzODMzNn0.yNce0WIZiV3HWUUTxLxWSDSTVao-yTwCuoIbSjZc3a4'
+            );
+            window.supabase = supabaseClient;
+            return supabaseClient;
+        } catch (error) {
+            console.error('Error cargando Supabase desde CDN:', error);
+            throw error;
+        }
+    } else {
+        // En Node.js, usar el cliente normal
+        const module = await import('../../supabase/supabaseClient.js');
+        supabaseClient = module.default;
+        return supabaseClient;
+    }
+}
 
 export class SucursalController {
     static async cargarSucursales() {
@@ -50,27 +88,27 @@ export class SucursalController {
         });
     }
 
-    
-static async seleccionarSucursal(sucursalId, sucursalNombre) 
-{    localStorage.setItem('sucursalId', sucursalId);   
+    static async seleccionarSucursal(sucursalId, sucursalNombre) {
+        localStorage.setItem('sucursalId', sucursalId);
         localStorage.setItem('sucursalNombre', sucursalNombre);
 
+        const supabase = await getSupabaseClient();
         const { data: farmacia, error } = await supabase
-        .from('farmacia')
-        .select('id_farmacia')
-        .eq('n_sucursal', parseInt(sucursalId))
-        .limit(1)
-        .single();
-    
-    if (!error && farmacia) {
-        localStorage.setItem('idFarmacia', farmacia.id_farmacia.toString());
-    } else {
-        localStorage.setItem('idFarmacia', '1');
+            .from('farmacia')
+            .select('id_farmacia')
+            .eq('n_sucursal', parseInt(sucursalId))
+            .limit(1)
+            .single();
+        
+        if (!error && farmacia) {
+            localStorage.setItem('idFarmacia', farmacia.id_farmacia.toString());
+        } else {
+            localStorage.setItem('idFarmacia', '1');
+        }
+        console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
+        
+        window.location.href = 'bienvenido.html';
     }
-    console.log('Sucursal seleccionada:', sucursalId, sucursalNombre);
-    
-    window.location.href = 'bienvenido.html';
-}
 
     static async inicializar() {
         const container = document.getElementById('sucursales-container');

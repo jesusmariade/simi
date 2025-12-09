@@ -1,7 +1,0 @@
-const SUPABASE_CONFIG = {
-  url: 'TU_SUPABASE_URL_AQUI',
-  anonKey: 'TU_SUPABASE_ANON_KEY_AQUI'
-};
-
-export default SUPABASE_CONFIG;
-
