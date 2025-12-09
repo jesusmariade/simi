@@ -117,7 +117,8 @@
         let carrito = []; // { id_receta_medicamento, nombre, cantidad, precio }
         
 
-        document.addEventListener("DOMContentLoaded", iniciar);
+        //document.addEventListener("DOMContentLoaded", iniciar);
+        iniciar();
 
         async function iniciar() {//se puede conseguir en farmacia ya que ahi tenemos los datos de receta
             const id_cita = localStorage.getItem("id_cita");
@@ -233,7 +234,7 @@
         }
 
     //para el carrito
-        function manejarCarrito(e) {
+        /*function manejarCarrito(e) {
             const btn = e.target;
             const id = btn.dataset.id; // id compuesto o id_receta_medicamento como string
             const idReal = btn.dataset.idReal ? Number(btn.dataset.idReal) : null; // id_receta_medicamento (PK)
@@ -265,7 +266,46 @@
             }
 
             renderVenta();
+        }*/
+
+        function manejarCarrito(e) {
+        const btn = e.currentTarget || e.target;
+        const id = String(btn.dataset.id); // id compuesto o id_receta_medicamento como string
+        const idReal = btn.dataset.idReal ? Number(btn.dataset.idReal) : null; // id_receta_medicamento (PK)
+        const idMedicamento = btn.dataset.idMedicamento ? Number(btn.dataset.idMedicamento) : null; // id_medicamento real
+        const nombre = btn.dataset.nombre;
+        const cantidad = Number(btn.dataset.cantidad);
+        const precio = Number(btn.dataset.precio);
+
+        // Buscar por id_rm como string para evitar mismatch de tipos
+        const index = carrito.findIndex(item => String(item.id_rm) === id);
+
+        if (index === -1) {
+            // agregar (guardar id_rm para poder quitar después)
+            carrito.push({
+                id_rm: id,
+                id_receta: Number(btn.closest("tr").dataset.idReceta),
+                id_receta_medicamento: idReal,
+                id_medicamento: idMedicamento,
+                nombre,
+                cantidad,
+                precio
+            });
+        } else {
+            // quitar
+            carrito.splice(index, 1);
         }
+
+        // Actualizar UI
+        renderVenta();
+
+        // Sincronizar textos de botones para consistencia
+        document.querySelectorAll(".btn-carrito").forEach(b => {
+            const bid = String(b.dataset.id);
+            const exists = carrito.some(item => String(item.id_rm) === bid);
+            b.textContent = exists ? "Quitar" : "Agregar a venta";
+        });
+    }
 
         //para venta
         function renderVenta() {
